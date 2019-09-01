@@ -1,0 +1,16 @@
+/configure
+/config.log
+/config.status
+/INSTALL
+/autom4te.cache/
+/depcomp
+/install-sh
+/missing
+/src/lpsdr
+/src/config.h
+/src/stamp-h1
+.deps
+Makefile
+*.o
+*.in
+*.m4
