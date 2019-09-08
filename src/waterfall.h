@@ -7,6 +7,7 @@
 #include <gtkmm/gesturepan.h>
 #include <gtkmm/gestureswipe.h>
 #include <gtkmm/gesturezoom.h>
+#include <hamlib/rigclass.h>
 
 class Waterfall : public Gtk::DrawingArea {
 public:
@@ -28,6 +29,7 @@ protected:
   void on_gesture_pan(Gtk::PanDirection direction, double offset);
   void on_gesture_swipe(double velocity_x, double velocity_y);
   void on_fft_added();
+  void on_freq_change();
 
   void update_kinematics();
   bool on_tick(const Glib::RefPtr<Gdk::FrameClock> &frame_clock);
@@ -37,6 +39,8 @@ protected:
   float swipe_velocity;
   float gesture_begin_bottom_freq;
   float gesture_begin_top_freq;
+  float fft_min;
+  float fft_scale;
 
   Glib::RefPtr<Gtk::GestureZoom> gesture_zoom;
   Glib::RefPtr<Gtk::GesturePan> gesture_pan;
@@ -48,6 +52,8 @@ protected:
   Cairo::RefPtr<Cairo::ImageSurface> background;
   unsigned char *background_data;
   Glib::Dispatcher on_add_fft_dispatcher;
+
+  Rig rig;
 };
 
 #endif
