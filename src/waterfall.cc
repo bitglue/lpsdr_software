@@ -246,5 +246,6 @@ void Waterfall::add_fft(float *fft, unsigned size) {
 }
 
 void Waterfall::on_fft_added() { queue_draw(); }
-
 void Waterfall::on_freq_change() { rig.setFreq((bottom_freq + top_freq) / 2); }
+void Waterfall::set_sensitivity(float sensitivity) { fft_min = sensitivity; }
+void Waterfall::set_range(float range) { fft_scale = range; }

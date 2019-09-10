@@ -3,8 +3,10 @@
 
 #include "flowgraph.h"
 #include "waterfall.h"
+#include <gtkmm/adjustment.h>
 #include <gtkmm/builder.h>
-#include <gtkmm/button.h>
+#include <gtkmm/spinbutton.h>
+#include <gtkmm/togglebutton.h>
 #include <gtkmm/window.h>
 
 class ApplicationController {
@@ -15,15 +17,17 @@ public:
   // widgets loaded by Gtk::Builder
   Gtk::Window *main_window;
   Waterfall *waterfall;
-  Gtk::Button *start_button;
-  Gtk::Button *stop_button;
+  Gtk::ToggleButton *run_button;
+  Gtk::SpinButton *range_spin, *sensitivity_spin;
+  Glib::RefPtr<Gtk::Adjustment> sensitivity_adjustment, range_adjustment;
 
 protected:
   Glib::RefPtr<Gtk::Builder> builder;
   bool on_delete_main_window();
-  void on_start_button_pressed();
-  void on_stop_button_pressed();
+  void on_run_button_toggled();
   void on_fft_done(float *, unsigned);
+  void on_range_changed();
+  void on_sensitivity_changed();
 
   Flowgraph::sptr flowgraph;
 };

@@ -19,6 +19,8 @@ public:
   // called from GNU Radio thread
   void add_fft(float *fft, unsigned size);
   static const unsigned fft_size = 4096;
+  void set_sensitivity(float);
+  void set_range(float);
 
 protected:
   bool on_draw(const Cairo::RefPtr<Cairo::Context> &cr) override;
