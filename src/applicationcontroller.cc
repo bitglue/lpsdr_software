@@ -12,10 +12,13 @@ ApplicationController::ApplicationController() {
   builder->get_widget_derived("waterfall", waterfall);
   builder->get_widget("mainwindow", main_window);
 
-  start_button->signal_clicked().connect(sigc::mem_fun(*this, &ApplicationController::on_start_button_pressed));
-  stop_button->signal_clicked().connect(sigc::mem_fun(*this, &ApplicationController::on_stop_button_pressed));
+  start_button->signal_clicked().connect(
+      sigc::mem_fun(*this, &ApplicationController::on_start_button_pressed));
+  stop_button->signal_clicked().connect(
+      sigc::mem_fun(*this, &ApplicationController::on_stop_button_pressed));
 
-  flowgraph->signal_fft_done().connect(sigc::mem_fun(*this, &ApplicationController::on_fft_done));
+  flowgraph->signal_fft_done().connect(
+      sigc::mem_fun(*this, &ApplicationController::on_fft_done));
 }
 
 ApplicationController::~ApplicationController() {}

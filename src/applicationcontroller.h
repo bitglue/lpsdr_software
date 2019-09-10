@@ -1,8 +1,8 @@
 #ifndef LPSDR_APPLICATIONCONTROLLER_H
 #define LPSDR_APPLICATIONCONTROLLER_H
 
-#include "waterfall.h"
 #include "flowgraph.h"
+#include "waterfall.h"
 #include <gtkmm/builder.h>
 #include <gtkmm/button.h>
 #include <gtkmm/window.h>
