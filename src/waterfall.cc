@@ -229,9 +229,9 @@ void Waterfall::add_fft(float *fft, unsigned size) {
   }
 
   memmove(background_data, background_data + background_stride,
-          background_height * (background_stride - 1));
-  unsigned char *new_row =
-      background_data + background_stride * (background_height - 1);
+          background_stride * (background_height - 1));
+  uint32_t *new_row = (uint32_t *)(background_data +
+                                   background_stride * (background_height - 1));
 
   for (int i = fft_size / 2; i < fft_size; i++) {
     float value = (fft[i] - fft_min) / fft_scale;
