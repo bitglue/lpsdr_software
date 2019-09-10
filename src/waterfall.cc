@@ -196,8 +196,7 @@ void Waterfall::on_gesture_swipe(double velocity_x, double velocity_y) {
   swipe_velocity = velocity_x * 0.05;
 }
 
-static void float_to_rgb(float f, unsigned char &r, unsigned char &g,
-                         unsigned char &b) {
+static uint32_t float_to_rgb(float f) {
   float f_red = f * 3.0 - 2;
   float f_green = f * 3.0 - 1;
   float f_blue = f * 3 - 0;
@@ -217,9 +216,10 @@ static void float_to_rgb(float f, unsigned char &r, unsigned char &g,
   if (f_blue > 1.0)
     f_blue = 1.0;
 
-  r = (unsigned char)(f_red * 256);
-  g = (unsigned char)(f_green * 256);
-  b = (unsigned char)(f_blue * 256);
+  uint32_t r = (f_red * 255);
+  uint32_t g = (f_green * 255);
+  uint32_t b = (f_blue * 255);
+  return (b) + (g << 8) + (r << 16);
 }
 
 // Called from GNU Radio thread
@@ -235,13 +235,11 @@ void Waterfall::add_fft(float *fft, unsigned size) {
 
   for (int i = fft_size / 2; i < fft_size; i++) {
     float value = (fft[i] - fft_min) / fft_scale;
-    float_to_rgb(value, new_row[2], new_row[1], new_row[0]);
-    new_row += 4;
+    *new_row++ = float_to_rgb(value);
   }
   for (int i = 0; i < fft_size / 2; i++) {
     float value = (fft[i] - fft_min) / fft_scale;
-    float_to_rgb(value, new_row[2], new_row[1], new_row[0]);
-    new_row += 4;
+    *new_row++ = float_to_rgb(value);
   }
 
   on_add_fft_dispatcher.emit();
