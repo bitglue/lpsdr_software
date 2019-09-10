@@ -3,6 +3,7 @@
 
 #include <cairomm/surface.h>
 #include <glibmm/dispatcher.h>
+#include <gtkmm/builder.h>
 #include <gtkmm/drawingarea.h>
 #include <gtkmm/gesturepan.h>
 #include <gtkmm/gestureswipe.h>
@@ -11,12 +12,13 @@
 
 class Waterfall : public Gtk::DrawingArea {
 public:
-  Waterfall();
+  Waterfall(Gtk::DrawingArea::BaseObjectType *cobject,
+            const Glib::RefPtr<Gtk::Builder> &builder);
   virtual ~Waterfall();
 
   // called from GNU Radio thread
-  void add_fft(float *fft);
-  static const int fft_size = 4096;
+  void add_fft(float *fft, unsigned size);
+  static const unsigned fft_size = 4096;
 
 protected:
   bool on_draw(const Cairo::RefPtr<Cairo::Context> &cr) override;

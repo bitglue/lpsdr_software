@@ -7,11 +7,11 @@
 #include <gtkmm/widget.h>
 #include <stdio.h>
 
-#include <iostream>
-
-Waterfall::Waterfall()
-    : bottom_freq(7e6), top_freq(7.048e6), swipe_velocity(0), fft_min(-120),
-      fft_scale(40), rig(RIG_MODEL_SI570AVRUSB) {
+Waterfall::Waterfall(Gtk::DrawingArea::BaseObjectType *cobject,
+                     const Glib::RefPtr<Gtk::Builder> &builder)
+    : Gtk::DrawingArea(cobject), bottom_freq(7e6), top_freq(7.048e6),
+      swipe_velocity(0), fft_min(-120), fft_scale(40),
+      rig(RIG_MODEL_SI570AVRUSB) {
   // add_tick_callback(sigc::mem_fun(*this, &Waterfall::on_tick));
 
   // gesture_zoom = Gtk::GestureZoom::create(*this);
@@ -223,7 +223,11 @@ static void float_to_rgb(float f, unsigned char &r, unsigned char &g,
 }
 
 // Called from GNU Radio thread
-void Waterfall::add_fft(float *fft) {
+void Waterfall::add_fft(float *fft, unsigned size) {
+  if (size != fft_size) {
+    return;
+  }
+
   memmove(background_data, background_data + background_stride,
           background_height * (background_stride - 1));
   unsigned char *new_row =

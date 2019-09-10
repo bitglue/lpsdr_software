@@ -1,11 +1,11 @@
+#include "applicationcontroller.h"
 #include "config.h"
-#include "mainwindow.h"
 #include <gtkmm/application.h>
 
 int main(int argc, char *argv[]) {
   int status;
   auto app = Gtk::Application::create(argc, argv, "com.bitglue.lpsdr");
+  auto app_controller = ApplicationController();
 
-  MainWindow mainwindow;
-  return app->run(mainwindow);
+  return app->run(*app_controller.main_window);
 }
