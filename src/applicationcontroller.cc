@@ -41,5 +41,4 @@ void ApplicationController::on_stop_button_pressed() {
 
 void ApplicationController::on_fft_done(float *magnitudes, unsigned size) {
   waterfall->add_fft(magnitudes, size);
-  std::cout << "fft done, size: " << size << "\n";
 }
