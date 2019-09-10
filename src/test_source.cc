@@ -12,7 +12,7 @@ test_source_impl::test_source_impl()
                       gr::io_signature::make(1, 1, sizeof(gr_complex))) {
 
   noise_source = gr::analog::noise_source_c::make(
-      gr::analog::noise_type_t::GR_UNIFORM, 0.001);
+      gr::analog::noise_type_t::GR_UNIFORM, 0.0004);
   throttle = gr::blocks::throttle::make(sizeof(gr_complex), sample_rate);
 
   connect(noise_source, 0, throttle, 0);
