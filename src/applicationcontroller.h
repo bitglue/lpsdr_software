@@ -25,7 +25,6 @@ public:
   Glib::RefPtr<Gtk::Adjustment> sensitivity_adjustment, range_adjustment;
 
 protected:
-  Glib::RefPtr<Gtk::Builder> builder;
   std::unique_ptr<LPSDRRig> rig;
   bool on_delete_main_window();
   void on_run_button_toggled();

@@ -9,7 +9,7 @@ ApplicationController::ApplicationController()
       rig(new TestRig()) {
   flowgraph = Flowgraph::make(rig->source());
 
-  builder = Gtk::Builder::create_from_file("src/ui.glade");
+  auto builder = Gtk::Builder::create_from_file("src/ui.glade");
   builder->get_widget("range", range_spin);
   builder->get_widget("sensitivity", sensitivity_spin);
   builder->get_widget("run_button", run_button);
@@ -38,7 +38,10 @@ ApplicationController::ApplicationController()
   on_run_button_toggled();
 }
 
-ApplicationController::~ApplicationController() {}
+ApplicationController::~ApplicationController() {
+  // only top-level objects from the builder must be freed
+  delete main_window;
+}
 
 bool ApplicationController::on_delete_main_window() {
   flowgraph->stop();
@@ -73,7 +76,6 @@ void ApplicationController::on_freq_changed() {
 
 void ApplicationController::on_rig_changed() {
   auto selected_rig = rig_selector->get_active_text();
-  std::cout << "rig changed: " << selected_rig << "\n";
   if (selected_rig == "Test") {
     rig.reset(new TestRig());
   } else if (selected_rig == "Softrock") {
