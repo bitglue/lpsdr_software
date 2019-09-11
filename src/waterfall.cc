@@ -5,10 +5,10 @@
 #include <ctime>
 #include <glibmm/main.h>
 #include <gtkmm/widget.h>
-#include <stdio.h>
+#include <cstdio>
 
 Waterfall::Waterfall(Gtk::DrawingArea::BaseObjectType *cobject,
-                     const Glib::RefPtr<Gtk::Builder> &builder)
+                     const Glib::RefPtr<Gtk::Builder> &)
     : Gtk::DrawingArea(cobject), bottom_freq(7e6), top_freq(7.048e6),
       swipe_velocity(0), fft_min(-120), fft_scale(40),
       rig(RIG_MODEL_SI570AVRUSB) {
@@ -50,9 +50,7 @@ Waterfall::~Waterfall() {
   if (background) {
     background->finish();
   }
-  if (background_data) {
-    delete background_data;
-  }
+  delete background_data;
 }
 
 bool Waterfall::on_draw(const Cairo::RefPtr<Cairo::Context> &cr) {
@@ -69,8 +67,8 @@ void Waterfall::draw_background(const Cairo::RefPtr<Cairo::Context> &cr) {
   const int height = allocation.get_height();
 
   cr->save();
-  cr->scale((float)width / (float)fft_size,
-            (float)height / (float)background_height);
+  cr->scale(static_cast<float>(width) / fft_size,
+            static_cast<float>(height) / background_height);
   cr->set_source(background, 0, 0);
   cairo_pattern_set_filter(cr->get_source()->cobj(), CAIRO_FILTER_BILINEAR);
   cr->paint();
@@ -134,7 +132,7 @@ void Waterfall::draw_tick(const Cairo::RefPtr<Cairo::Context> &cr, float freq) {
 }
 
 void Waterfall::update_kinematics() {
-  if (swipe_velocity) {
+  if (swipe_velocity != 0) {
     float hz = top_freq - bottom_freq;
     float hz_per_px = hz / get_allocation().get_width();
     bottom_freq -= hz_per_px * swipe_velocity;
@@ -146,13 +144,8 @@ void Waterfall::update_kinematics() {
   }
 }
 
-bool Waterfall::on_tick(const Glib::RefPtr<Gdk::FrameClock> &frame_clock) {
+bool Waterfall::on_tick(const Glib::RefPtr<Gdk::FrameClock> &) {
   update_kinematics();
-
-  float fft[fft_size];
-  for (int i = 0; i < fft_size; i++) {
-    fft[i] = (float)rand() / (float)RAND_MAX;
-  }
 
   auto win = get_window();
   if (win) {
@@ -163,7 +156,7 @@ bool Waterfall::on_tick(const Glib::RefPtr<Gdk::FrameClock> &frame_clock) {
   return true;
 }
 
-void Waterfall::on_gesture_begin(GdkEventSequence *seq) {
+void Waterfall::on_gesture_begin(GdkEventSequence *) {
   gesture_begin_bottom_freq = bottom_freq;
   gesture_begin_top_freq = top_freq;
   swipe_velocity = 0.0;
@@ -192,7 +185,7 @@ void Waterfall::on_gesture_pan(Gtk::PanDirection direction, double offset) {
   queue_draw();
 }
 
-void Waterfall::on_gesture_swipe(double velocity_x, double velocity_y) {
+void Waterfall::on_gesture_swipe(double velocity_x, double) {
   swipe_velocity = velocity_x * 0.05;
 }
 
@@ -230,14 +223,14 @@ void Waterfall::add_fft(float *fft, unsigned size) {
 
   memmove(background_data, background_data + background_stride,
           background_stride * (background_height - 1));
-  uint32_t *new_row = (uint32_t *)(background_data +
+  uint32_t *new_row = reinterpret_cast<uint32_t *>(background_data +
                                    background_stride * (background_height - 1));
 
-  for (int i = fft_size / 2; i < fft_size; i++) {
+  for (unsigned i = fft_size / 2; i < fft_size; i++) {
     float value = (fft[i] - fft_min) / fft_scale;
     *new_row++ = float_to_rgb(value);
   }
-  for (int i = 0; i < fft_size / 2; i++) {
+  for (unsigned i = 0; i < fft_size / 2; i++) {
     float value = (fft[i] - fft_min) / fft_scale;
     *new_row++ = float_to_rgb(value);
   }

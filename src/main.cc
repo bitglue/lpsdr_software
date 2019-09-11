@@ -3,7 +3,6 @@
 #include <gtkmm/application.h>
 
 int main(int argc, char *argv[]) {
-  int status;
   auto app = Gtk::Application::create(argc, argv, "com.bitglue.lpsdr");
   auto app_controller = ApplicationController();
 

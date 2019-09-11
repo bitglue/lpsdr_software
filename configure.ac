@@ -3,6 +3,8 @@ AC_INIT([lpsdr], [0.1], [indigo@bitglue.com])
 AC_CONFIG_HEADERS([src/config.h])
 AC_CONFIG_FILES([Makefile src/Makefile])
 
+: ${CXXFLAGS="-g -O2 -Wall -Wextra -Wshadow -Wnon-virtual-dtor -Werror -pedantic -std=c++11"}
+
 AC_PROG_CXX
 
 PKG_PROG_PKG_CONFIG

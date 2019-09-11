@@ -10,7 +10,6 @@ iq_audio_source::sptr iq_audio_source::make() {
 iq_audio_source_impl::iq_audio_source_impl()
     : gr::hier_block2("iq_audio_source", gr::io_signature::make(0, 0, 0),
                       gr::io_signature::make(1, 1, sizeof(gr_complex))) {
-
   audio_source = gr::audio::source::make(sample_rate);
   delay = gr::blocks::delay::make(sizeof(float), 1);
   float_to_complex = gr::blocks::float_to_complex::make();

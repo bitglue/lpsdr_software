@@ -28,7 +28,7 @@ dispatcher_sink_impl::~dispatcher_sink_impl() {}
 
 int dispatcher_sink_impl::work(int noutput_items,
                                gr_vector_const_void_star &input_items,
-                               gr_vector_void_star &output_items) {
+                               gr_vector_void_star &) {
   const gr_complex *in = (const gr_complex *)input_items[0];
 
   int produced_items = 0;
