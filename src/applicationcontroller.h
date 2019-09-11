@@ -6,6 +6,7 @@
 #include "waterfall.h"
 #include <gtkmm/adjustment.h>
 #include <gtkmm/builder.h>
+#include <gtkmm/comboboxtext.h>
 #include <gtkmm/spinbutton.h>
 #include <gtkmm/togglebutton.h>
 #include <gtkmm/window.h>
@@ -20,6 +21,7 @@ public:
   Waterfall *waterfall;
   Gtk::ToggleButton *run_button;
   Gtk::SpinButton *range_spin, *sensitivity_spin;
+  Gtk::ComboBoxText *rig_selector;
   Glib::RefPtr<Gtk::Adjustment> sensitivity_adjustment, range_adjustment;
 
 protected:
@@ -31,6 +33,7 @@ protected:
   void on_range_changed();
   void on_sensitivity_changed();
   void on_freq_changed();
+  void on_rig_changed();
 
   Flowgraph::sptr flowgraph;
 };

@@ -14,6 +14,7 @@ public:
   dispatcher_sink::signal_fft_done_t signal_fft_done();
 
   static sptr make(gr::basic_block_sptr source);
+  void set_source(gr::basic_block_sptr);
 
 protected:
   gr::basic_block_sptr m_source;

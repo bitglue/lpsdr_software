@@ -6,11 +6,11 @@
 
 class Softrock : public LPSDRRig {
 public:
+  Softrock();
   gr::basic_block_sptr source();
   void set_freq(double);
 
 protected:
-  Softrock();
   Rig rig;
 };
 

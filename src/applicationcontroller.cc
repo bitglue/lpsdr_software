@@ -1,5 +1,6 @@
 #include "applicationcontroller.h"
 #include "config.h"
+#include "rig/softrock.h"
 #include "rig/test.h"
 
 ApplicationController::ApplicationController()
@@ -14,6 +15,7 @@ ApplicationController::ApplicationController()
   builder->get_widget("run_button", run_button);
   builder->get_widget_derived("waterfall", waterfall);
   builder->get_widget("mainwindow", main_window);
+  builder->get_widget("rig_selector", rig_selector);
 
   range_spin->set_adjustment(range_adjustment);
   sensitivity_spin->set_adjustment(sensitivity_adjustment);
@@ -28,6 +30,8 @@ ApplicationController::ApplicationController()
       sigc::mem_fun(*this, &ApplicationController::on_fft_done));
   waterfall->signal_freq_changed().connect(
       sigc::mem_fun(*this, &ApplicationController::on_freq_changed));
+  rig_selector->signal_changed().connect(
+      sigc::mem_fun(*this, &ApplicationController::on_rig_changed));
 
   on_sensitivity_changed();
   on_range_changed();
@@ -65,4 +69,16 @@ void ApplicationController::on_sensitivity_changed() {
 
 void ApplicationController::on_freq_changed() {
   rig->set_freq(waterfall->get_center_freq());
+}
+
+void ApplicationController::on_rig_changed() {
+  auto selected_rig = rig_selector->get_active_text();
+  std::cout << "rig changed: " << selected_rig << "\n";
+  if (selected_rig == "Test") {
+    rig.reset(new TestRig());
+  } else if (selected_rig == "Softrock") {
+    rig.reset(new Softrock());
+  }
+  on_freq_changed();
+  flowgraph->set_source(rig->source());
 }

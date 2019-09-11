@@ -7,7 +7,9 @@
 class TestRig : public LPSDRRig {
 public:
   gr::basic_block_sptr source() { return test_source::make(); };
-  void set_freq(double f){ std::cout << "test rig frequency changed to " << f << "\n"; };
+  void set_freq(double f) {
+    std::cout << "test rig frequency changed to " << f << "\n";
+  };
 };
 
 #endif
