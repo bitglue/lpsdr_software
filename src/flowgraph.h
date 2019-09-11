@@ -9,14 +9,14 @@ class Flowgraph : public gr::top_block {
 public:
   typedef boost::shared_ptr<Flowgraph> sptr;
 
-  Flowgraph();
+  Flowgraph(gr::basic_block_sptr source);
   virtual ~Flowgraph();
   dispatcher_sink::signal_fft_done_t signal_fft_done();
 
-  static sptr make();
+  static sptr make(gr::basic_block_sptr source);
 
 protected:
-  gr::basic_block_sptr source;
+  gr::basic_block_sptr m_source;
   dispatcher_sink::sptr waterfall_sink;
 };
 

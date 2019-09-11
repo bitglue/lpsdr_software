@@ -2,6 +2,7 @@
 #define LPSDR_APPLICATIONCONTROLLER_H
 
 #include "flowgraph.h"
+#include "rig/rig.h"
 #include "waterfall.h"
 #include <gtkmm/adjustment.h>
 #include <gtkmm/builder.h>
@@ -23,11 +24,13 @@ public:
 
 protected:
   Glib::RefPtr<Gtk::Builder> builder;
+  std::unique_ptr<LPSDRRig> rig;
   bool on_delete_main_window();
   void on_run_button_toggled();
   void on_fft_done(float *, unsigned);
   void on_range_changed();
   void on_sensitivity_changed();
+  void on_freq_changed();
 
   Flowgraph::sptr flowgraph;
 };

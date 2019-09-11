@@ -1,17 +1,16 @@
 #include "waterfall.h"
 #include <cairomm/context.h>
 #include <cmath>
+#include <cstdio>
 #include <cstdlib>
 #include <ctime>
 #include <glibmm/main.h>
 #include <gtkmm/widget.h>
-#include <cstdio>
 
 Waterfall::Waterfall(Gtk::DrawingArea::BaseObjectType *cobject,
                      const Glib::RefPtr<Gtk::Builder> &)
     : Gtk::DrawingArea(cobject), bottom_freq(7e6), top_freq(7.048e6),
-      swipe_velocity(0), fft_min(-120), fft_scale(40),
-      rig(RIG_MODEL_SI570AVRUSB) {
+      swipe_velocity(0), fft_min(-120), fft_scale(40) {
   // add_tick_callback(sigc::mem_fun(*this, &Waterfall::on_tick));
 
   // gesture_zoom = Gtk::GestureZoom::create(*this);
@@ -42,8 +41,7 @@ Waterfall::Waterfall(Gtk::DrawingArea::BaseObjectType *cobject,
 
   on_add_fft_dispatcher.connect(sigc::mem_fun(*this, &Waterfall::on_fft_added));
 
-  rig.open();
-  on_freq_change();
+  m_signal_freq_changed.emit();
 }
 
 Waterfall::~Waterfall() {
@@ -135,8 +133,11 @@ void Waterfall::update_kinematics() {
   if (swipe_velocity != 0) {
     float hz = top_freq - bottom_freq;
     float hz_per_px = hz / get_allocation().get_width();
+
     bottom_freq -= hz_per_px * swipe_velocity;
     top_freq -= hz_per_px * swipe_velocity;
+    m_signal_freq_changed.emit();
+
     swipe_velocity *= 0.75;
     if (abs(swipe_velocity) < 1.0) {
       swipe_velocity = 0;
@@ -168,7 +169,7 @@ void Waterfall::on_gesture_zoom(double scale) {
   range /= scale;
   top_freq = center_freq + (range / 2);
   bottom_freq = center_freq - (range / 2);
-  on_freq_change();
+  m_signal_freq_changed.emit();
   queue_draw();
 }
 
@@ -181,7 +182,7 @@ void Waterfall::on_gesture_pan(Gtk::PanDirection direction, double offset) {
   }
   bottom_freq = gesture_begin_bottom_freq + hz_pan;
   top_freq = gesture_begin_top_freq + hz_pan;
-  on_freq_change();
+  m_signal_freq_changed.emit();
   queue_draw();
 }
 
@@ -223,8 +224,8 @@ void Waterfall::add_fft(float *fft, unsigned size) {
 
   memmove(background_data, background_data + background_stride,
           background_stride * (background_height - 1));
-  uint32_t *new_row = reinterpret_cast<uint32_t *>(background_data +
-                                   background_stride * (background_height - 1));
+  uint32_t *new_row = reinterpret_cast<uint32_t *>(
+      background_data + background_stride * (background_height - 1));
 
   for (unsigned i = fft_size / 2; i < fft_size; i++) {
     float value = (fft[i] - fft_min) / fft_scale;
@@ -239,6 +240,5 @@ void Waterfall::add_fft(float *fft, unsigned size) {
 }
 
 void Waterfall::on_fft_added() { queue_draw(); }
-void Waterfall::on_freq_change() { rig.setFreq((bottom_freq + top_freq) / 2); }
 void Waterfall::set_sensitivity(float sensitivity) { fft_min = sensitivity; }
 void Waterfall::set_range(float range) { fft_scale = range; }

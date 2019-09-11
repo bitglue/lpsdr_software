@@ -1,10 +1,12 @@
 #include "applicationcontroller.h"
 #include "config.h"
+#include "rig/test.h"
 
 ApplicationController::ApplicationController()
     : sensitivity_adjustment(Gtk::Adjustment::create(-110, -120, 0)),
-      range_adjustment(Gtk::Adjustment::create(40, 1, 100)) {
-  flowgraph = Flowgraph::make();
+      range_adjustment(Gtk::Adjustment::create(40, 1, 100)),
+      rig(new TestRig()) {
+  flowgraph = Flowgraph::make(rig->source());
 
   builder = Gtk::Builder::create_from_file("src/ui.glade");
   builder->get_widget("range", range_spin);
@@ -22,9 +24,10 @@ ApplicationController::ApplicationController()
       sigc::mem_fun(*this, &ApplicationController::on_range_changed));
   sensitivity_adjustment->signal_value_changed().connect(
       sigc::mem_fun(*this, &ApplicationController::on_sensitivity_changed));
-
   flowgraph->signal_fft_done().connect(
       sigc::mem_fun(*this, &ApplicationController::on_fft_done));
+  waterfall->signal_freq_changed().connect(
+      sigc::mem_fun(*this, &ApplicationController::on_freq_changed));
 
   on_sensitivity_changed();
   on_range_changed();
@@ -58,4 +61,8 @@ void ApplicationController::on_range_changed() {
 
 void ApplicationController::on_sensitivity_changed() {
   waterfall->set_sensitivity(sensitivity_adjustment->get_value());
+}
+
+void ApplicationController::on_freq_changed() {
+  rig->set_freq(waterfall->get_center_freq());
 }

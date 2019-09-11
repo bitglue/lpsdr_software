@@ -8,7 +8,6 @@
 #include <gtkmm/gesturepan.h>
 #include <gtkmm/gestureswipe.h>
 #include <gtkmm/gesturezoom.h>
-#include <hamlib/rigclass.h>
 
 class Waterfall : public Gtk::DrawingArea {
 public:
@@ -22,6 +21,11 @@ public:
   void set_sensitivity(float);
   void set_range(float);
 
+  float get_bottom_freq() { return bottom_freq; };
+  float get_top_freq() { return top_freq; };
+  float get_center_freq() { return (bottom_freq + top_freq) / 2; };
+  sigc::signal<void> signal_freq_changed() { return m_signal_freq_changed; }
+
 protected:
   bool on_draw(const Cairo::RefPtr<Cairo::Context> &cr) override;
   void draw_background(const Cairo::RefPtr<Cairo::Context> &cr);
@@ -33,7 +37,6 @@ protected:
   void on_gesture_pan(Gtk::PanDirection direction, double offset);
   void on_gesture_swipe(double velocity_x, double velocity_y);
   void on_fft_added();
-  void on_freq_change();
 
   void update_kinematics();
   bool on_tick(const Glib::RefPtr<Gdk::FrameClock> &frame_clock);
@@ -50,14 +53,13 @@ protected:
   Glib::RefPtr<Gtk::GesturePan> gesture_pan;
   Glib::RefPtr<Gtk::GestureSwipe> gesture_swipe;
 
+  sigc::signal<void> m_signal_freq_changed;
   const int background_height = 256;
   int background_stride;
   const Cairo::Format background_format = Cairo::Format::FORMAT_RGB24;
   Cairo::RefPtr<Cairo::ImageSurface> background;
   unsigned char *background_data;
   Glib::Dispatcher on_add_fft_dispatcher;
-
-  Rig rig;
 };
 
 #endif

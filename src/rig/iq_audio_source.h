@@ -1,5 +1,5 @@
-#ifndef LPSDR_IQ_AUDIO_SOURCE_H
-#define LPSDR_IQ_AUDIO_SOURCE_H
+#ifndef LPSDR_RIG_IQ_AUDIO_SOURCE_H
+#define LPSDR_RIG_IQ_AUDIO_SOURCE_H
 
 #include <gnuradio/audio/source.h>
 #include <gnuradio/blocks/delay.h>

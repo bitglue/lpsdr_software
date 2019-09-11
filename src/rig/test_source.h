@@ -1,5 +1,5 @@
-#ifndef LPSDR_TEST_SOURCE_H
-#define LPSDR_TEST_SOURCE_H
+#ifndef LPSDR_RIG_TEST_SOURCE_H
+#define LPSDR_RIG_TEST_SOURCE_H
 
 #include <gnuradio/analog/noise_source_c.h>
 #include <gnuradio/blocks/throttle.h>
