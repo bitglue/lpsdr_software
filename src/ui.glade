@@ -90,6 +90,7 @@
                 <items>
                   <item translatable="yes">Test</item>
                   <item translatable="yes">Softrock</item>
+                  <item translatable="yes">Breadboard</item>
                 </items>
               </object>
               <packing>

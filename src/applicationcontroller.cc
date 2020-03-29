@@ -1,5 +1,6 @@
 #include "applicationcontroller.h"
 #include "config.h"
+#include "rig/breadboard.h"
 #include "rig/softrock.h"
 #include "rig/test.h"
 
@@ -80,6 +81,8 @@ void ApplicationController::on_rig_changed() {
     rig.reset(new TestRig());
   } else if (selected_rig == "Softrock") {
     rig.reset(new Softrock());
+  } else if (selected_rig == "Breadboard") {
+    rig.reset(new Breadboard());
   }
   on_freq_changed();
   flowgraph->set_source(rig->source());
