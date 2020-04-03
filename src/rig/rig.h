@@ -9,6 +9,7 @@ public:
 
   virtual gr::basic_block_sptr source() = 0;
   virtual void set_freq(double) = 0;
+  virtual double get_freq() = 0;
 };
 
 #endif

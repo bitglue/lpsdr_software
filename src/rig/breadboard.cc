@@ -8,17 +8,15 @@
 #define I2C_READ 0x61
 #define I2C_BUS 1
 
-Breadboard::Breadboard() {
-  pigpio = pigpio_start(NULL, NULL);
-}
+Breadboard::Breadboard() { pigpio = pigpio_start(NULL, NULL); }
 
-Breadboard::~Breadboard() {
-  pigpio_stop(pigpio);
-}
+Breadboard::~Breadboard() { pigpio_stop(pigpio); }
 
 gr::basic_block_sptr Breadboard::source() { return iq_audio_source::make(); }
 
 void Breadboard::set_freq(double f) { si5351aSetFrequency(uint32_t(f)); }
+
+double Breadboard::get_freq() { return last_freq; }
 
 //
 // Set up specified PLL with mult, num and denom
