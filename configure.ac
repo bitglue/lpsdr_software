@@ -18,5 +18,27 @@ PKG_CHECK_MODULES([GNURADIO_AUDIO], [gnuradio-audio])
 PKG_CHECK_MODULES([GNURADIO_IQBALANCE], [gnuradio-iqbalance])
 PKG_CHECK_MODULES([HAMLIB], [hamlib])
 
+AC_ARG_WITH([pigpio],
+    [AS_HELP_STRING([--with-pigpio], [support manipulating GPIO on the Raspberry Pi @<:@default=check@:>@])],
+    [],
+    [with_pigpio=check])
+
+AS_IF([test "x$with_pigpio" != xno],
+    [AC_CHECK_LIB([pigpiod_if2], [i2c_open],
+        [
+            HAVE_PIGPIO=yes
+            AC_SUBST([PIGPIO_LIBS], ["-lpigpiod_if2"])
+        ],
+        [
+            HAVE_PIGPIO=no
+            if test "x$with_pigpio" != xcheck; then
+                AC_MSG_FAILURE([--with-pigpio was given, but test for pigpio failed])
+            fi
+        ]
+    )]
+)
+
+AM_CONDITIONAL([USE_PIGPIO], [test "x$HAVE_PIGPIO" = xyes])
+
 AM_INIT_AUTOMAKE([-Wall -Werror])
 AC_OUTPUT
