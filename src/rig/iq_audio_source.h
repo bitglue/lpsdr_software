@@ -12,14 +12,6 @@
 class iq_audio_source : virtual public gr::hier_block2 {
 public:
   typedef boost::shared_ptr<iq_audio_source> sptr;
-
-  /*!
-   * \brief Return a shared_ptr to a new instance of lpsdr::dispatcher_sink.
-   *
-   * To avoid accidental use of raw pointers, dispatcher_sink's constructor is
-   * in a private implementation class. dispatcher_sink::make is the public
-   * interface for creating new instances.
-   */
   static sptr make();
 };
 
