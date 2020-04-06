@@ -14,7 +14,7 @@ Breadboard::~Breadboard() { pigpio_stop(pigpio); }
 
 gr::basic_block_sptr Breadboard::source() { return iq_audio_source::make(); }
 
-void Breadboard::set_freq(double f) { si5351aSetFrequency(uint32_t(f)); }
+void Breadboard::set_freq(double f) { si5351aSetFrequency(uint32_t(f * 4)); }
 
 double Breadboard::get_freq() { return last_freq; }
 
