@@ -9,7 +9,7 @@
 
 Waterfall::Waterfall(Gtk::DrawingArea::BaseObjectType *cobject,
                      const Glib::RefPtr<Gtk::Builder> &)
-    : Gtk::DrawingArea(cobject), bottom_freq(7e6), top_freq(7.048e6),
+    : Gtk::DrawingArea(cobject), bottom_freq(14e6), top_freq(14.048e6),
       swipe_velocity(0), fft_min(-120), fft_scale(40) {
   // add_tick_callback(sigc::mem_fun(*this, &Waterfall::on_tick));
 
