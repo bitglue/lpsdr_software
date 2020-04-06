@@ -1,5 +1,6 @@
 #include "dispatcher_sink.h"
 #include <assert.h>
+#include <gnuradio/filter/firdes.h>
 #include <gnuradio/io_signature.h>
 #include <string.h>
 #include <volk/volk.h>
@@ -22,9 +23,17 @@ dispatcher_sink_impl::dispatcher_sink_impl()
 
   items_available.connect(
       sigc::mem_fun(*this, &dispatcher_sink_impl::dispatch_signals));
+
+  build_window();
 }
 
 dispatcher_sink_impl::~dispatcher_sink_impl() {}
+
+void dispatcher_sink_impl::build_window() {
+  window.clear();
+  window = gr::filter::firdes::window(gr::filter::firdes::WIN_BLACKMAN_HARRIS,
+                                      fft_size, 6.76);
+}
 
 int dispatcher_sink_impl::work(int noutput_items,
                                gr_vector_const_void_star &input_items,
@@ -60,6 +69,11 @@ int dispatcher_sink_impl::work(int noutput_items,
 }
 
 void dispatcher_sink_impl::execute_fft() {
+  if (window.size()) {
+    volk_32fc_32f_multiply_32fc(fft.get_inbuf(), fft.get_inbuf(),
+                                &window.front(), window.size());
+  }
+
   fft.execute();
   waterfall_item magnitudes;
   if (free_buffers.pop(magnitudes)) {

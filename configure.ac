@@ -17,6 +17,7 @@ PKG_CHECK_MODULES([GNURADIO_BLOCKS], [gnuradio-blocks])
 PKG_CHECK_MODULES([GNURADIO_FFT], [gnuradio-fft])
 PKG_CHECK_MODULES([GNURADIO_AUDIO], [gnuradio-audio])
 PKG_CHECK_MODULES([GNURADIO_IQBALANCE], [gnuradio-iqbalance])
+PKG_CHECK_MODULES([GNURADIO_FILTER], [gnuradio-filter])
 PKG_CHECK_MODULES([HAMLIB], [hamlib])
 
 AC_ARG_WITH([pigpio],

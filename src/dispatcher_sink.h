@@ -34,6 +34,7 @@ public:
 
 protected:
   gr::fft::fft_complex fft;
+  std::vector<float> window;
   int items_in_buffer;
 
   // buffers are popped from free_buffers and pushed into full_buffers as FFTs
@@ -44,6 +45,7 @@ protected:
   boost::lockfree::spsc_queue<waterfall_item, boost::lockfree::capacity<4>>
       full_buffers;
 
+  void build_window();
   void execute_fft();
 
   // Signals that some FFTs are ready in full_buffers.
