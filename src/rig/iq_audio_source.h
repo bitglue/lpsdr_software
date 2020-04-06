@@ -13,12 +13,14 @@ class iq_audio_source : virtual public gr::hier_block2 {
 public:
   typedef boost::shared_ptr<iq_audio_source> sptr;
   static sptr make();
+  virtual void set_dly(int d) = 0;
 };
 
 class iq_audio_source_impl : public iq_audio_source {
 public:
   iq_audio_source_impl();
   ~iq_audio_source_impl();
+  void set_dly(int d);
 
 protected:
   gr::audio::source::sptr audio_source;

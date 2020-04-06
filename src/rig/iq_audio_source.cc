@@ -11,7 +11,7 @@ iq_audio_source_impl::iq_audio_source_impl()
     : gr::hier_block2("iq_audio_source", gr::io_signature::make(0, 0, 0),
                       gr::io_signature::make(1, 1, sizeof(gr_complex))) {
   audio_source = gr::audio::source::make(sample_rate);
-  delay = gr::blocks::delay::make(sizeof(float), 1);
+  delay = gr::blocks::delay::make(sizeof(float), 0);
   float_to_complex = gr::blocks::float_to_complex::make();
   message_debug = gr::blocks::message_debug::make();
 
@@ -35,6 +35,8 @@ iq_audio_source_impl::iq_audio_source_impl()
 
   connect(iqbal_fix, 0, self(), 0);
 }
+
+void iq_audio_source_impl::set_dly(int d) { delay->set_dly(d); }
 
 /*
  * Our virtual destructor.
