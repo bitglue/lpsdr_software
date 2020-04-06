@@ -1,6 +1,7 @@
 #include "applicationcontroller.h"
 #include "config.h"
 #include "rig/breadboard.h"
+#include "rig/iqonly.h"
 #include "rig/softrock.h"
 #include "rig/test.h"
 
@@ -93,6 +94,8 @@ void ApplicationController::on_rig_changed() {
     rig.reset(new Softrock());
   } else if (selected_rig == "Breadboard") {
     rig.reset(new Breadboard());
+  } else if (selected_rig == "IQ Only") {
+    rig.reset(new IQOnly());
   }
   on_freq_changed();
   on_delay_changed();
