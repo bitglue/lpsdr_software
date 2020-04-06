@@ -40,6 +40,7 @@ ApplicationController::ApplicationController()
   rig_selector->signal_changed().connect(
       sigc::mem_fun(*this, &ApplicationController::on_rig_changed));
 
+  flowgraph->enable_udp_debug("192.168.1.113", 1234, 1472, false);
   on_sensitivity_changed();
   on_range_changed();
   on_run_button_toggled();

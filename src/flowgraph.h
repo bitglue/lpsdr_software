@@ -2,6 +2,7 @@
 #define LIBSDR_FLOWGRAPH_H
 
 #include "dispatcher_sink.h"
+#include <gnuradio/blocks/udp_sink.h>
 #include <gnuradio/hier_block2.h>
 #include <gnuradio/top_block.h>
 
@@ -15,10 +16,14 @@ public:
 
   static sptr make(gr::basic_block_sptr source);
   void set_source(gr::basic_block_sptr);
+  void enable_udp_debug(const std::string &host, int port,
+                        int payload_size = 1472, bool eof = true);
+  void disable_udp_debug();
 
 protected:
   gr::basic_block_sptr m_source;
   dispatcher_sink::sptr waterfall_sink;
+  gr::blocks::udp_sink::sptr m_udp_sink;
 };
 
 #endif
