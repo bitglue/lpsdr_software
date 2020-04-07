@@ -4,6 +4,7 @@
 #include "iq_audio_source.h"
 #include "rig.h"
 #include <gtkmm/adjustment.h>
+#include <gtkmm/entry.h>
 #include <gtkmm/scale.h>
 #include <gtkmm/spinbutton.h>
 #include <gtkmm/togglebutton.h>
@@ -25,11 +26,13 @@ protected:
       m_delay_adjustment;
   Gtk::Scale *m_magnitude_scale, *m_phase_scale;
   Gtk::ToggleButton *m_iq_auto_button;
+  Gtk::Entry *m_device_entry;
   sigc::connection iq_bal_poller;
 
   void on_delay_changed();
   void on_iq_auto_toggled();
   void on_iq_bal_changed();
+  void on_device_changed();
   bool on_timeout();
   bool iq_auto_enabled() { return m_iq_auto_button->get_active(); }
 };

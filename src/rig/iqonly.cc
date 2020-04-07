@@ -14,6 +14,7 @@ IQOnly::IQOnly()
   builder->get_widget("magnitude_scale", m_magnitude_scale);
   builder->get_widget("phase_scale", m_phase_scale);
   builder->get_widget("iq_auto_button", m_iq_auto_button);
+  builder->get_widget("device_entry", m_device_entry);
 
   m_magnitude_scale->set_adjustment(m_magnitude_adjustment);
   m_magnitude_scale->set_increments(0.0001, 0.0001);
@@ -31,6 +32,9 @@ IQOnly::IQOnly()
 
   m_iq_auto_button->signal_toggled().connect(
       sigc::mem_fun(*this, &IQOnly::on_iq_auto_toggled));
+
+  m_device_entry->signal_activate().connect(
+      sigc::mem_fun(*this, &IQOnly::on_device_changed));
 
   on_delay_changed();
 }
@@ -73,5 +77,20 @@ bool IQOnly::on_timeout() {
     return true;
   } else {
     return false;
+  }
+}
+
+void IQOnly::on_device_changed() {
+  auto old_device = m_source->device_name();
+  auto new_device = m_device_entry->get_text();
+
+  if (old_device == new_device)
+    return;
+  try {
+    m_source->set_audio_device(new_device);
+  } catch (std::runtime_error &e) {
+    std::cout << e.what() << "\n" << m_source->device_name() << "\n";
+    // TODO: some better error handling would be nice here.
+    m_device_entry->set_text(old_device);
   }
 }
