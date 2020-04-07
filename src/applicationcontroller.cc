@@ -2,10 +2,13 @@
 
 #include "applicationcontroller.h"
 #include "config.h"
-#include "rig/breadboard.h"
 #include "rig/iqonly.h"
 #include "rig/softrock.h"
 #include "rig/test.h"
+
+#ifdef HAVE_BREADBOARD
+#include "rig/breadboard.h"
+#endif
 
 ApplicationController::ApplicationController()
     : sensitivity_adjustment(Gtk::Adjustment::create(-110, -120, 0)),
@@ -88,8 +91,10 @@ void ApplicationController::on_rig_changed() {
     rig.reset(new TestRig());
   } else if (selected_rig == "Softrock") {
     rig.reset(new Softrock());
+#ifdef HAVE_BREADBOARD
   } else if (selected_rig == "Breadboard") {
     rig.reset(new Breadboard());
+#endif
   } else if (selected_rig == "IQ Only") {
     rig.reset(new IQOnly());
   }

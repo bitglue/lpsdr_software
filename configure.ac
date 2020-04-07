@@ -29,6 +29,7 @@ AS_IF([test "x$with_pigpio" != xno],
     [AC_CHECK_LIB([pigpiod_if2], [i2c_open],
         [
             HAVE_PIGPIO=yes
+            AC_DEFINE([HAVE_BREADBOARD], [1], [Define if the breadboard rig will be built])
             AC_SUBST([PIGPIO_LIBS], ["-lpigpiod_if2"])
         ],
         [
