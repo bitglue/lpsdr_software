@@ -1,19 +1,16 @@
 #ifndef LPSDR_RIG_BREADBOARD_H
 #define LPSDR_RIG_BREADBOARD_H
 
-#include "rig.h"
+#include "iqonly.h"
 
-class Breadboard : public LPSDRRig {
+class Breadboard : public IQOnly {
 public:
   Breadboard();
   ~Breadboard();
-  gr::basic_block_sptr source();
   void set_freq(double);
-  double get_freq();
 
 protected:
   int pigpio;
-  double last_freq;
   void setupPLL(int i2c, uint8_t pll, uint8_t mult, uint32_t num,
                 uint32_t denom);
   void setupMultisynth(int i2c, uint8_t synth, uint32_t divider, uint8_t rDiv);

@@ -12,11 +12,10 @@ Breadboard::Breadboard() { pigpio = pigpio_start(NULL, NULL); }
 
 Breadboard::~Breadboard() { pigpio_stop(pigpio); }
 
-gr::basic_block_sptr Breadboard::source() { return iq_audio_source::make(); }
-
-void Breadboard::set_freq(double f) { si5351aSetFrequency(uint32_t(f * 4)); }
-
-double Breadboard::get_freq() { return last_freq; }
+void Breadboard::set_freq(double f) {
+  si5351aSetFrequency(uint32_t(f * 4));
+  m_freq = f;
+}
 
 //
 // Set up specified PLL with mult, num and denom

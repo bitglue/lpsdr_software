@@ -1,19 +1,17 @@
 #ifndef LPSDR_RIG_SOFTROCK_H
 #define LPSDR_RIG_SOFTROCK_H
 
-#include "rig.h"
+#include "iqonly.h"
 #include <hamlib/rigclass.h>
 
-class Softrock : public LPSDRRig {
+class Softrock : public IQOnly {
 public:
   Softrock();
-  gr::basic_block_sptr source();
   void set_freq(double);
   double get_freq();
 
 protected:
   Rig rig;
-  Gtk::Window *m_settings_window;
 };
 
 #endif
