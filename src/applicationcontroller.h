@@ -5,7 +5,7 @@
 #include "rig/rig.h"
 #include "waterfall.h"
 #include <gtkmm/adjustment.h>
-#include <gtkmm/builder.h>
+#include <gtkmm/button.h>
 #include <gtkmm/comboboxtext.h>
 #include <gtkmm/spinbutton.h>
 #include <gtkmm/togglebutton.h>
@@ -20,10 +20,10 @@ public:
   Gtk::Window *main_window;
   Waterfall *waterfall;
   Gtk::ToggleButton *run_button;
-  Gtk::SpinButton *range_spin, *sensitivity_spin, *delay_spin;
+  Gtk::SpinButton *range_spin, *sensitivity_spin;
+  Gtk::Button *rig_settings_button;
   Gtk::ComboBoxText *rig_selector;
-  Glib::RefPtr<Gtk::Adjustment> sensitivity_adjustment, range_adjustment,
-      delay_adjustment;
+  Glib::RefPtr<Gtk::Adjustment> sensitivity_adjustment, range_adjustment;
 
 protected:
   std::unique_ptr<LPSDRRig> rig;
@@ -31,10 +31,10 @@ protected:
   void on_run_button_toggled();
   void on_fft_done(float *, unsigned);
   void on_range_changed();
-  void on_delay_changed();
   void on_sensitivity_changed();
   void on_freq_changed();
   void on_rig_changed();
+  void on_rig_settings_clicked();
 
   Flowgraph::sptr flowgraph;
 };

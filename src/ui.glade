@@ -101,9 +101,11 @@
               </packing>
             </child>
             <child>
-              <object class="GtkSpinButton" id="delay">
+              <object class="GtkButton" id="rig_settings_button">
+                <property name="label" translatable="yes">Rig Settings</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
+                <property name="receives_default">True</property>
               </object>
               <packing>
                 <property name="expand">False</property>

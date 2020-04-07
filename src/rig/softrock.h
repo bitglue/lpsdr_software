@@ -13,6 +13,7 @@ public:
 
 protected:
   Rig rig;
+  Gtk::Window *m_settings_window;
 };
 
 #endif

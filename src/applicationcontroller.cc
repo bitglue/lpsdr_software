@@ -1,3 +1,5 @@
+#include <gtkmm/builder.h>
+
 #include "applicationcontroller.h"
 #include "config.h"
 #include "rig/breadboard.h"
@@ -8,7 +10,6 @@
 ApplicationController::ApplicationController()
     : sensitivity_adjustment(Gtk::Adjustment::create(-110, -120, 0)),
       range_adjustment(Gtk::Adjustment::create(40, 1, 100)),
-      delay_adjustment(Gtk::Adjustment::create(-10, 1, 10)),
       rig(new TestRig()) {
   flowgraph = Flowgraph::make(rig->source());
 
@@ -16,21 +17,20 @@ ApplicationController::ApplicationController()
   builder->get_widget("range", range_spin);
   builder->get_widget("sensitivity", sensitivity_spin);
   builder->get_widget("run_button", run_button);
-  builder->get_widget("delay", delay_spin);
+  builder->get_widget("rig_settings_button", rig_settings_button);
   builder->get_widget_derived("waterfall", waterfall);
   builder->get_widget("mainwindow", main_window);
   builder->get_widget("rig_selector", rig_selector);
 
   range_spin->set_adjustment(range_adjustment);
   sensitivity_spin->set_adjustment(sensitivity_adjustment);
-  delay_spin->set_adjustment(delay_adjustment);
 
   run_button->signal_toggled().connect(
       sigc::mem_fun(*this, &ApplicationController::on_run_button_toggled));
+  rig_settings_button->signal_clicked().connect(
+      sigc::mem_fun(*this, &ApplicationController::on_rig_settings_clicked));
   range_adjustment->signal_value_changed().connect(
       sigc::mem_fun(*this, &ApplicationController::on_range_changed));
-  delay_adjustment->signal_value_changed().connect(
-      sigc::mem_fun(*this, &ApplicationController::on_delay_changed));
   sensitivity_adjustment->signal_value_changed().connect(
       sigc::mem_fun(*this, &ApplicationController::on_sensitivity_changed));
   flowgraph->signal_fft_done().connect(
@@ -44,7 +44,6 @@ ApplicationController::ApplicationController()
   on_sensitivity_changed();
   on_range_changed();
   on_run_button_toggled();
-  on_delay_changed();
 }
 
 ApplicationController::~ApplicationController() {
@@ -75,10 +74,6 @@ void ApplicationController::on_range_changed() {
   waterfall->set_range(range_adjustment->get_value());
 }
 
-void ApplicationController::on_delay_changed() {
-  rig->set_dly(delay_adjustment->get_value());
-}
-
 void ApplicationController::on_sensitivity_changed() {
   waterfall->set_sensitivity(sensitivity_adjustment->get_value());
 }
@@ -99,6 +94,9 @@ void ApplicationController::on_rig_changed() {
     rig.reset(new IQOnly());
   }
   on_freq_changed();
-  on_delay_changed();
   flowgraph->set_source(rig->source());
+}
+
+void ApplicationController::on_rig_settings_clicked() {
+  rig->show_settings_window();
 }

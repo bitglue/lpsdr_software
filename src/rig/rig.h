@@ -2,6 +2,7 @@
 #define LPSDR_RIG_RIG_H
 
 #include <gnuradio/hier_block2.h>
+#include <gtkmm/window.h>
 
 class LPSDRRig {
 public:
@@ -10,7 +11,7 @@ public:
   virtual gr::basic_block_sptr source() = 0;
   virtual void set_freq(double) = 0;
   virtual double get_freq() = 0;
-  virtual void set_dly(int){};
+  virtual void show_settings_window(){};
 };
 
 #endif

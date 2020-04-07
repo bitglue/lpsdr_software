@@ -6,6 +6,7 @@ lpsdr_SOURCES = \
     flowgraph.cc \
     main.cc \
     waterfall.cc \
+    rig/test.cc \
     rig/iq_audio_source.cc \
     rig/softrock.cc \
     rig/iqonly.cc \
