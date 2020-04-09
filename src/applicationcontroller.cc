@@ -17,16 +17,16 @@ ApplicationController::ApplicationController()
   flowgraph = Flowgraph::make(rig->source());
 
   auto builder = Gtk::Builder::create_from_file("src/ui.glade");
-  builder->get_widget("range", range_spin);
-  builder->get_widget("sensitivity", sensitivity_spin);
+  builder->get_widget("range_scale", range_scale);
+  builder->get_widget("sensitivity_scale", sensitivity_scale);
   builder->get_widget("run_button", run_button);
   builder->get_widget("rig_settings_button", rig_settings_button);
   builder->get_widget_derived("waterfall", waterfall);
   builder->get_widget("mainwindow", main_window);
   builder->get_widget("rig_selector", rig_selector);
 
-  range_spin->set_adjustment(range_adjustment);
-  sensitivity_spin->set_adjustment(sensitivity_adjustment);
+  range_scale->set_adjustment(range_adjustment);
+  sensitivity_scale->set_adjustment(sensitivity_adjustment);
 
   run_button->signal_toggled().connect(
       sigc::mem_fun(*this, &ApplicationController::on_run_button_toggled));

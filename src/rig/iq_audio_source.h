@@ -4,6 +4,7 @@
 #include <gnuradio/audio/source.h>
 #include <gnuradio/blocks/delay.h>
 #include <gnuradio/blocks/float_to_complex.h>
+#include <gnuradio/filter/fir_filter_ccf.h>
 #include <gnuradio/hier_block2.h>
 #include <gnuradio/iqbalance/fix_cc.h>
 #include <gnuradio/iqbalance/optimize_c.h>
@@ -39,10 +40,22 @@ public:
 
 protected:
   gr::audio::source::sptr audio_source;
-  gr::blocks::delay::sptr delay;
   gr::blocks::float_to_complex::sptr float_to_complex;
+
+  // Some audio interfaces delay one channel which makes IQ balance
+  // optimization fail to converge over the entire audio bandwidth. This delay
+  // can be set to compensate.
+  gr::blocks::delay::sptr delay;
+
+  // Low-frequency noise (a lot of it mains hum) tends to be imposed on both I
+  // and Q signals at low frequencies. If we don't filter it out, the IQ
+  // optimization algorithm can converge on that noise, leading to a wacky
+  // result.
+  gr::filter::fir_filter_ccf::sptr mains_hum_filter;
+
   gr::iqbalance::fix_cc::sptr iqbal_fix;
   gr::iqbalance::optimize_c::sptr iqbal_optimize;
+
   std::string m_device_name;
 
   void connect_audio_source();

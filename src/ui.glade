@@ -14,12 +14,12 @@
       <object class="GtkPaned">
         <property name="visible">True</property>
         <property name="can_focus">True</property>
-        <property name="position">133</property>
+        <property name="orientation">vertical</property>
+        <property name="position">41</property>
         <child>
           <object class="GtkBox">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
-            <property name="orientation">vertical</property>
             <child>
               <object class="GtkToggleButton" id="run_button">
                 <property name="label" translatable="yes">Run</property>
@@ -48,12 +48,14 @@
               </packing>
             </child>
             <child>
-              <object class="GtkSpinButton" id="sensitivity">
+              <object class="GtkScale" id="sensitivity_scale">
                 <property name="visible">True</property>
-                <property name="can_focus">False</property>
+                <property name="can_focus">True</property>
+                <property name="round_digits">1</property>
+                <property name="draw_value">False</property>
               </object>
               <packing>
-                <property name="expand">False</property>
+                <property name="expand">True</property>
                 <property name="fill">True</property>
                 <property name="position">2</property>
               </packing>
@@ -72,12 +74,14 @@
               </packing>
             </child>
             <child>
-              <object class="GtkSpinButton" id="range">
+              <object class="GtkScale" id="range_scale">
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
+                <property name="round_digits">1</property>
+                <property name="draw_value">False</property>
               </object>
               <packing>
-                <property name="expand">False</property>
+                <property name="expand">True</property>
                 <property name="fill">True</property>
                 <property name="position">4</property>
               </packing>

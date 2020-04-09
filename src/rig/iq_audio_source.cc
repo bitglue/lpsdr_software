@@ -1,5 +1,6 @@
 #include "iq_audio_source.h"
 #include "gr_lock.h"
+#include <gnuradio/filter/firdes.h>
 #include <gnuradio/io_signature.h>
 
 static const int sample_rate = 48000;
@@ -16,17 +17,18 @@ iq_audio_source_impl::iq_audio_source_impl(const std::string device_name)
   delay = gr::blocks::delay::make(sizeof(float), 0);
   float_to_complex = gr::blocks::float_to_complex::make();
 
+  auto taps = gr::filter::firdes::high_pass_2(1, sample_rate, 1800, 2500, 65);
+  mains_hum_filter = gr::filter::fir_filter_ccf::make(1, taps);
+
   iqbal_fix = gr::iqbalance::fix_cc::make(0, 0);
   iqbal_optimize = gr::iqbalance::optimize_c::make(0);
 
   connect_audio_source();
   connect(delay, 0, float_to_complex, 0);
-
-  connect(float_to_complex, 0, iqbal_fix, 0);
-
-  connect(float_to_complex, 0, iqbal_optimize, 0);
+  connect(float_to_complex, 0, mains_hum_filter, 0);
+  connect(mains_hum_filter, 0, iqbal_optimize, 0);
   msg_connect(iqbal_optimize, "iqbal_corr", iqbal_fix, "iqbal_corr");
-
+  connect(float_to_complex, 0, iqbal_fix, 0);
   connect(iqbal_fix, 0, self(), 0);
 }
 
