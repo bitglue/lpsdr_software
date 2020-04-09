@@ -1,10 +1,10 @@
-#include <gtkmm/builder.h>
-
 #include "applicationcontroller.h"
 #include "config.h"
+#include "mode/ssb.h"
 #include "rig/iqonly.h"
 #include "rig/softrock.h"
 #include "rig/test.h"
+#include <gtkmm/builder.h>
 
 #ifdef HAVE_BREADBOARD
 #include "rig/breadboard.h"
@@ -47,6 +47,8 @@ ApplicationController::ApplicationController()
   on_sensitivity_changed();
   on_range_changed();
   on_run_button_toggled();
+
+  set_mode(SSB::make());
 }
 
 ApplicationController::~ApplicationController() {
@@ -104,4 +106,9 @@ void ApplicationController::on_rig_changed() {
 
 void ApplicationController::on_rig_settings_clicked() {
   rig->show_settings_window();
+}
+
+void ApplicationController::set_mode(std::shared_ptr<Mode> mode) {
+  m_mode = mode;
+  flowgraph->set_demod(mode->demod());
 }
