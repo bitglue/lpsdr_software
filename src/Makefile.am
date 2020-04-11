@@ -5,6 +5,7 @@ lpsdr_SOURCES = \
     dispatcher_sink.cc \
     flowgraph.cc \
     main.cc \
+    freq_db.cc \
     waterfall.cc \
     mode/ssb.cc \
     rig/test.cc \

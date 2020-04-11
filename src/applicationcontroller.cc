@@ -13,6 +13,7 @@
 ApplicationController::ApplicationController()
     : sensitivity_adjustment(Gtk::Adjustment::create(-110, -120, 0)),
       range_adjustment(Gtk::Adjustment::create(40, 1, 100)),
+      freq_adjustment(Gtk::Adjustment::create(14e6, 0, 30e6)),
       rig(new TestRig()) {
   flowgraph = Flowgraph::make(rig->source());
 
@@ -20,16 +21,25 @@ ApplicationController::ApplicationController()
   builder->get_widget("range_scale", range_scale);
   builder->get_widget("sensitivity_scale", sensitivity_scale);
   builder->get_widget("run_button", run_button);
+  builder->get_widget("band_down_button", band_down_button);
+  builder->get_widget("band_up_button", band_up_button);
   builder->get_widget("rig_settings_button", rig_settings_button);
   builder->get_widget_derived("waterfall", waterfall);
   builder->get_widget("mainwindow", main_window);
   builder->get_widget("rig_selector", rig_selector);
+  builder->get_widget("freq_spin", m_freq_spin);
 
   range_scale->set_adjustment(range_adjustment);
   sensitivity_scale->set_adjustment(sensitivity_adjustment);
+  m_freq_spin->set_adjustment(freq_adjustment);
+  waterfall->set_adjustment(freq_adjustment);
 
   run_button->signal_toggled().connect(
       sigc::mem_fun(*this, &ApplicationController::on_run_button_toggled));
+  band_down_button->signal_clicked().connect(
+      sigc::mem_fun(*this, &ApplicationController::band_down));
+  band_up_button->signal_clicked().connect(
+      sigc::mem_fun(*this, &ApplicationController::band_up));
   rig_settings_button->signal_clicked().connect(
       sigc::mem_fun(*this, &ApplicationController::on_rig_settings_clicked));
   range_adjustment->signal_value_changed().connect(
@@ -38,7 +48,7 @@ ApplicationController::ApplicationController()
       sigc::mem_fun(*this, &ApplicationController::on_sensitivity_changed));
   flowgraph->signal_fft_done().connect(
       sigc::mem_fun(*this, &ApplicationController::on_fft_done));
-  waterfall->signal_freq_changed().connect(
+  freq_adjustment->signal_value_changed().connect(
       sigc::mem_fun(*this, &ApplicationController::on_freq_changed));
   rig_selector->signal_changed().connect(
       sigc::mem_fun(*this, &ApplicationController::on_rig_changed));
@@ -84,7 +94,7 @@ void ApplicationController::on_sensitivity_changed() {
 }
 
 void ApplicationController::on_freq_changed() {
-  rig->set_freq(waterfall->get_center_freq());
+  rig->set_freq(freq_adjustment->get_value());
 }
 
 void ApplicationController::on_rig_changed() {
@@ -111,4 +121,17 @@ void ApplicationController::on_rig_settings_clicked() {
 void ApplicationController::set_mode(std::shared_ptr<Mode> mode) {
   m_mode = mode;
   flowgraph->set_demod(mode->demod());
+}
+
+void ApplicationController::band_down() {
+  tune_to_band(m_freq_db.band_below(freq_adjustment->get_value()));
+}
+
+void ApplicationController::band_up() {
+  tune_to_band(m_freq_db.band_above(freq_adjustment->get_value()));
+}
+
+void ApplicationController::tune_to_band(const Band &b) {
+  auto f = b.center();
+  freq_adjustment->set_value(f);
 }

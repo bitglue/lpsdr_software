@@ -7,9 +7,13 @@
 #include <glibmm/main.h>
 #include <gtkmm/widget.h>
 
+// TODO: don't hardcode this. Have to do some thinking about how to determine
+// the waterfall width, and implement zooming.
+const unsigned sample_rate = 48000;
+
 Waterfall::Waterfall(Gtk::DrawingArea::BaseObjectType *cobject,
                      const Glib::RefPtr<Gtk::Builder> &)
-    : Gtk::DrawingArea(cobject), bottom_freq(14e6), top_freq(14.048e6),
+    : Gtk::DrawingArea(cobject), bottom_freq(0), top_freq(sample_rate),
       swipe_velocity(0), fft_min(-120), fft_scale(40) {
   // add_tick_callback(sigc::mem_fun(*this, &Waterfall::on_tick));
 
@@ -40,8 +44,6 @@ Waterfall::Waterfall(Gtk::DrawingArea::BaseObjectType *cobject,
                                   background_height, background_stride);
 
   on_add_fft_dispatcher.connect(sigc::mem_fun(*this, &Waterfall::on_fft_added));
-
-  m_signal_freq_changed.emit();
 }
 
 Waterfall::~Waterfall() {
@@ -136,7 +138,9 @@ void Waterfall::update_kinematics() {
 
     bottom_freq -= hz_per_px * swipe_velocity;
     top_freq -= hz_per_px * swipe_velocity;
-    m_signal_freq_changed.emit();
+    if (m_adjustment) {
+      m_adjustment->set_value(get_center_freq());
+    }
 
     swipe_velocity *= 0.75;
     if (abs(swipe_velocity) < 1.0) {
@@ -169,7 +173,9 @@ void Waterfall::on_gesture_zoom(double scale) {
   range /= scale;
   top_freq = center_freq + (range / 2);
   bottom_freq = center_freq - (range / 2);
-  m_signal_freq_changed.emit();
+  if (m_adjustment) {
+    m_adjustment->set_value(center_freq);
+  }
   queue_draw();
 }
 
@@ -182,7 +188,9 @@ void Waterfall::on_gesture_pan(Gtk::PanDirection direction, double offset) {
   }
   bottom_freq = gesture_begin_bottom_freq + hz_pan;
   top_freq = gesture_begin_top_freq + hz_pan;
-  m_signal_freq_changed.emit();
+  if (m_adjustment) {
+    m_adjustment->set_value(get_center_freq());
+  }
   queue_draw();
 }
 
@@ -242,3 +250,23 @@ void Waterfall::add_fft(float *fft, unsigned size) {
 void Waterfall::on_fft_added() { queue_draw(); }
 void Waterfall::set_sensitivity(float sensitivity) { fft_min = sensitivity; }
 void Waterfall::set_range(float range) { fft_scale = range; }
+
+void Waterfall::set_adjustment(
+    const Glib::RefPtr<Gtk::Adjustment> &adjustment) {
+  if (m_adjustment_connection) {
+    m_adjustment_connection.disconnect();
+  }
+
+  m_adjustment = adjustment;
+  m_adjustment_connection = adjustment->signal_value_changed().connect(
+      sigc::mem_fun(*this, &Waterfall::on_freq_changed));
+
+  on_freq_changed();
+}
+
+void Waterfall::on_freq_changed() {
+  auto freq = m_adjustment->get_value();
+  bottom_freq = freq - sample_rate / 2;
+  top_freq = freq + sample_rate / 2;
+  queue_draw();
+}
