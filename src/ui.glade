@@ -13,6 +13,8 @@
         <property name="margin_right">6</property>
         <property name="margin_top">6</property>
         <property name="margin_bottom">6</property>
+        <property name="row_spacing">6</property>
+        <property name="column_spacing">6</property>
         <child>
           <object class="GtkScale" id="sensitivity_scale">
             <property name="width_request">200</property>
@@ -45,7 +47,7 @@
             <property name="can_focus">False</property>
             <property name="halign">end</property>
             <property name="valign">center</property>
-            <property name="margin_top">5</property>
+            <property name="margin_left">12</property>
             <property name="label" translatable="yes">Sensitivity</property>
           </object>
           <packing>
@@ -59,7 +61,6 @@
             <property name="can_focus">False</property>
             <property name="halign">end</property>
             <property name="valign">center</property>
-            <property name="margin_top">5</property>
             <property name="label" translatable="yes">Range</property>
           </object>
           <packing>
@@ -73,7 +74,6 @@
             <property name="visible">True</property>
             <property name="can_focus">True</property>
             <property name="receives_default">True</property>
-            <property name="margin_right">6</property>
             <property name="active">True</property>
           </object>
           <packing>
@@ -82,43 +82,54 @@
           </packing>
         </child>
         <child>
-          <object class="GtkComboBoxText" id="rig_selector">
+          <object class="GtkBox">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
-            <property name="margin_right">6</property>
-            <property name="margin_top">6</property>
-            <property name="active">0</property>
-            <items>
-              <item translatable="yes">Test</item>
-              <item translatable="yes">IQ Only</item>
-              <item translatable="yes">Softrock</item>
-              <item translatable="yes">Breadboard</item>
-            </items>
+            <child>
+              <object class="GtkComboBoxText" id="rig_selector">
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <property name="active">0</property>
+                <items>
+                  <item translatable="yes">Test</item>
+                  <item translatable="yes">IQ Only</item>
+                  <item translatable="yes">Softrock</item>
+                  <item translatable="yes">Breadboard</item>
+                </items>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">True</property>
+                <property name="position">0</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkButton" id="rig_settings_button">
+                <property name="visible">True</property>
+                <property name="can_focus">True</property>
+                <property name="receives_default">True</property>
+                <child>
+                  <object class="GtkImage">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="icon_name">emblem-system-symbolic</property>
+                  </object>
+                </child>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">True</property>
+                <property name="position">1</property>
+              </packing>
+            </child>
+            <style>
+              <class name="linked"/>
+            </style>
           </object>
           <packing>
             <property name="left_attach">0</property>
             <property name="top_attach">1</property>
           </packing>
-        </child>
-        <child>
-          <object class="GtkButton" id="rig_settings_button">
-            <property name="label" translatable="yes">Rig Settings</property>
-            <property name="visible">True</property>
-            <property name="can_focus">True</property>
-            <property name="receives_default">True</property>
-            <property name="margin_right">6</property>
-            <property name="margin_top">6</property>
-          </object>
-          <packing>
-            <property name="left_attach">0</property>
-            <property name="top_attach">2</property>
-          </packing>
-        </child>
-        <child>
-          <placeholder/>
-        </child>
-        <child>
-          <placeholder/>
         </child>
       </object>
     </child>
@@ -133,6 +144,8 @@
         <property name="margin_right">6</property>
         <property name="margin_top">6</property>
         <property name="margin_bottom">6</property>
+        <property name="row_spacing">6</property>
+        <property name="column_spacing">6</property>
         <child>
           <object class="GtkSpinButton" id="freq_spin">
             <property name="visible">True</property>
@@ -152,7 +165,6 @@
             <property name="visible">True</property>
             <property name="can_focus">False</property>
             <property name="valign">baseline</property>
-            <property name="margin_top">6</property>
             <property name="hexpand">True</property>
             <property name="layout_style">expand</property>
             <child>
@@ -192,7 +204,6 @@
             <property name="visible">True</property>
             <property name="can_focus">False</property>
             <property name="halign">end</property>
-            <property name="margin_right">6</property>
             <property name="label" translatable="yes">Frequency</property>
           </object>
           <packing>
@@ -205,7 +216,6 @@
             <property name="visible">True</property>
             <property name="can_focus">False</property>
             <property name="halign">end</property>
-            <property name="margin_right">6</property>
             <property name="margin_top">6</property>
             <property name="label" translatable="yes">Band</property>
           </object>
@@ -234,6 +244,7 @@
           <object class="GtkBox">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
+            <property name="spacing">6</property>
             <child>
               <object class="GtkComboBoxText" id="mode_combo">
                 <property name="name">mode_combo</property>
