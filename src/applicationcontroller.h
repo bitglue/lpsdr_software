@@ -7,6 +7,7 @@
 #include "rig/rig.h"
 #include "waterfall.h"
 #include <gtkmm/adjustment.h>
+#include <gtkmm/box.h>
 #include <gtkmm/button.h>
 #include <gtkmm/comboboxtext.h>
 #include <gtkmm/scale.h>
@@ -27,6 +28,7 @@ public:
   Gtk::Button *rig_settings_button, *band_down_button, *band_up_button;
   Gtk::ComboBoxText *rig_selector, *mode_combo;
   Gtk::SpinButton *m_freq_spin;
+  Gtk::Box *m_mode_box;
   Glib::RefPtr<Gtk::Adjustment> sensitivity_adjustment, range_adjustment,
       freq_adjustment;
 

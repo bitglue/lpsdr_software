@@ -134,6 +134,45 @@
       </object>
     </child>
   </object>
+  <object class="GtkPopover" id="mode_popover">
+    <property name="can_focus">False</property>
+    <child>
+      <object class="GtkBox" id="mode_box">
+        <property name="name">mode_box</property>
+        <property name="visible">True</property>
+        <property name="can_focus">False</property>
+        <property name="margin_left">6</property>
+        <property name="margin_right">6</property>
+        <property name="margin_top">6</property>
+        <property name="margin_bottom">6</property>
+        <property name="orientation">vertical</property>
+        <property name="spacing">6</property>
+        <child>
+          <object class="GtkComboBoxText" id="mode_combo">
+            <property name="name">mode_combo</property>
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+          </object>
+          <packing>
+            <property name="expand">True</property>
+            <property name="fill">True</property>
+            <property name="position">0</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkSeparator">
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">True</property>
+            <property name="position">1</property>
+          </packing>
+        </child>
+      </object>
+    </child>
+  </object>
   <object class="GtkPopover" id="tuning_popover">
     <property name="can_focus">False</property>
     <child>
@@ -246,10 +285,18 @@
             <property name="can_focus">False</property>
             <property name="spacing">6</property>
             <child>
-              <object class="GtkComboBoxText" id="mode_combo">
-                <property name="name">mode_combo</property>
+              <object class="GtkMenuButton">
                 <property name="visible">True</property>
-                <property name="can_focus">False</property>
+                <property name="can_focus">True</property>
+                <property name="receives_default">True</property>
+                <property name="popover">mode_popover</property>
+                <child>
+                  <object class="GtkLabel">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="label" translatable="yes">Mode</property>
+                  </object>
+                </child>
               </object>
               <packing>
                 <property name="expand">True</property>

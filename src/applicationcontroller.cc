@@ -29,13 +29,15 @@ ApplicationController::ApplicationController()
   builder->get_widget("rig_selector", rig_selector);
   builder->get_widget("mode_combo", mode_combo);
   builder->get_widget("freq_spin", m_freq_spin);
+  builder->get_widget("mode_box", m_mode_box);
 
   range_scale->set_adjustment(range_adjustment);
   sensitivity_scale->set_adjustment(sensitivity_adjustment);
   m_freq_spin->set_adjustment(freq_adjustment);
   waterfall->set_adjustment(freq_adjustment);
 
-  mode_combo->append("SSB");
+  mode_combo->append("LSB");
+  mode_combo->append("USB");
 
   run_button->signal_toggled().connect(
       sigc::mem_fun(*this, &ApplicationController::on_run_button_toggled));
@@ -59,7 +61,7 @@ ApplicationController::ApplicationController()
       sigc::mem_fun(*this, &ApplicationController::on_mode_changed));
 
   flowgraph->enable_udp_debug("192.168.1.113", 1234, 1472, false);
-  mode_combo->set_active_text("SSB");
+  mode_combo->set_active_text("USB");
   on_sensitivity_changed();
   on_range_changed();
   on_run_button_toggled();
@@ -124,13 +126,22 @@ void ApplicationController::on_rig_settings_clicked() {
 
 void ApplicationController::on_mode_changed() {
   auto selected_mode = mode_combo->get_active_text();
-  if (selected_mode == "SSB") {
-    set_mode(SSB::make());
+  if (selected_mode == "USB") {
+    set_mode(SSB::make(false));
+  } else if (selected_mode == "LSB") {
+    set_mode(SSB::make(true));
   }
 }
 
 void ApplicationController::set_mode(std::shared_ptr<Mode> mode) {
+  auto children = m_mode_box->get_children();
+  for (unsigned i = 2; i < children.size(); i++) {
+    auto child = children.at(i);
+    m_mode_box->remove(*child);
+  }
   m_mode = mode;
+  m_mode_box->add(mode->settings_widget());
+  m_mode_box->show_all();
   flowgraph->set_demod(mode->demod());
 }
 
