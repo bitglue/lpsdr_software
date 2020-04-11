@@ -27,12 +27,15 @@ ApplicationController::ApplicationController()
   builder->get_widget_derived("waterfall", waterfall);
   builder->get_widget("mainwindow", main_window);
   builder->get_widget("rig_selector", rig_selector);
+  builder->get_widget("mode_combo", mode_combo);
   builder->get_widget("freq_spin", m_freq_spin);
 
   range_scale->set_adjustment(range_adjustment);
   sensitivity_scale->set_adjustment(sensitivity_adjustment);
   m_freq_spin->set_adjustment(freq_adjustment);
   waterfall->set_adjustment(freq_adjustment);
+
+  mode_combo->append("SSB");
 
   run_button->signal_toggled().connect(
       sigc::mem_fun(*this, &ApplicationController::on_run_button_toggled));
@@ -52,13 +55,14 @@ ApplicationController::ApplicationController()
       sigc::mem_fun(*this, &ApplicationController::on_freq_changed));
   rig_selector->signal_changed().connect(
       sigc::mem_fun(*this, &ApplicationController::on_rig_changed));
+  mode_combo->signal_changed().connect(
+      sigc::mem_fun(*this, &ApplicationController::on_mode_changed));
 
   flowgraph->enable_udp_debug("192.168.1.113", 1234, 1472, false);
+  mode_combo->set_active_text("SSB");
   on_sensitivity_changed();
   on_range_changed();
   on_run_button_toggled();
-
-  set_mode(SSB::make());
 }
 
 ApplicationController::~ApplicationController() {
@@ -116,6 +120,13 @@ void ApplicationController::on_rig_changed() {
 
 void ApplicationController::on_rig_settings_clicked() {
   rig->show_settings_window();
+}
+
+void ApplicationController::on_mode_changed() {
+  auto selected_mode = mode_combo->get_active_text();
+  if (selected_mode == "SSB") {
+    set_mode(SSB::make());
+  }
 }
 
 void ApplicationController::set_mode(std::shared_ptr<Mode> mode) {

@@ -25,7 +25,7 @@ public:
   Gtk::ToggleButton *run_button;
   Gtk::Scale *range_scale, *sensitivity_scale;
   Gtk::Button *rig_settings_button, *band_down_button, *band_up_button;
-  Gtk::ComboBoxText *rig_selector;
+  Gtk::ComboBoxText *rig_selector, *mode_combo;
   Gtk::SpinButton *m_freq_spin;
   Glib::RefPtr<Gtk::Adjustment> sensitivity_adjustment, range_adjustment,
       freq_adjustment;
@@ -39,6 +39,7 @@ protected:
   void on_freq_changed();
   void on_rig_changed();
   void on_rig_settings_clicked();
+  void on_mode_changed();
   void set_mode(std::shared_ptr<Mode>);
   void band_down();
   void band_up();
