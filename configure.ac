@@ -6,6 +6,8 @@ AC_CONFIG_FILES([Makefile src/Makefile])
 : ${CXXFLAGS="-g -O2 -Wall -Wextra -Wshadow -Wnon-virtual-dtor -Werror -pedantic -std=c++11"}
 
 AC_PROG_CXX
+AC_PROG_RANLIB
+AM_PROG_AR
 
 PKG_PROG_PKG_CONFIG
 PKG_CHECK_MODULES([GTKMM], [gtkmm-3.0 >= 3.8.0])
