@@ -48,13 +48,13 @@ SSB::SSB(bool lower_sideband)
       m_lower_sideband(lower_sideband) {
   m_builder = Gtk::Builder::create_from_file("src/mode/ssb.glade");
 
-  m_builder->get_widget("lower_spin", m_lower_spin);
-  m_builder->get_widget("upper_spin", m_upper_spin);
-  m_builder->get_widget("transition_spin", m_transition_spin);
+  m_builder->get_widget("lower_scale", m_lower_scale);
+  m_builder->get_widget("upper_scale", m_upper_scale);
+  m_builder->get_widget("transition_scale", m_transition_scale);
 
-  m_lower_spin->set_adjustment(m_lower);
-  m_upper_spin->set_adjustment(m_upper);
-  m_transition_spin->set_adjustment(m_transition);
+  m_lower_scale->set_adjustment(m_lower);
+  m_upper_scale->set_adjustment(m_upper);
+  m_transition_scale->set_adjustment(m_transition);
 
   m_demod = SSBDemod::make();
 

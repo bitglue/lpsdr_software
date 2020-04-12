@@ -20,17 +20,6 @@
       </packing>
     </child>
     <child>
-      <object class="GtkSpinButton" id="lower_spin">
-        <property name="visible">True</property>
-        <property name="can_focus">True</property>
-        <property name="hexpand">True</property>
-      </object>
-      <packing>
-        <property name="left_attach">1</property>
-        <property name="top_attach">0</property>
-      </packing>
-    </child>
-    <child>
       <object class="GtkLabel">
         <property name="visible">True</property>
         <property name="can_focus">False</property>
@@ -39,17 +28,6 @@
       </object>
       <packing>
         <property name="left_attach">0</property>
-        <property name="top_attach">1</property>
-      </packing>
-    </child>
-    <child>
-      <object class="GtkSpinButton" id="upper_spin">
-        <property name="visible">True</property>
-        <property name="can_focus">True</property>
-        <property name="hexpand">True</property>
-      </object>
-      <packing>
-        <property name="left_attach">1</property>
         <property name="top_attach">1</property>
       </packing>
     </child>
@@ -66,9 +44,44 @@
       </packing>
     </child>
     <child>
-      <object class="GtkSpinButton" id="transition_spin">
+      <object class="GtkScale" id="lower_scale">
+        <property name="width_request">200</property>
         <property name="visible">True</property>
         <property name="can_focus">True</property>
+        <property name="hexpand">True</property>
+        <property name="round_digits">1</property>
+        <property name="digits">0</property>
+        <property name="value_pos">left</property>
+      </object>
+      <packing>
+        <property name="left_attach">1</property>
+        <property name="top_attach">0</property>
+      </packing>
+    </child>
+    <child>
+      <object class="GtkScale" id="upper_scale">
+        <property name="width_request">200</property>
+        <property name="visible">True</property>
+        <property name="can_focus">True</property>
+        <property name="hexpand">True</property>
+        <property name="round_digits">1</property>
+        <property name="digits">0</property>
+        <property name="value_pos">left</property>
+      </object>
+      <packing>
+        <property name="left_attach">1</property>
+        <property name="top_attach">1</property>
+      </packing>
+    </child>
+    <child>
+      <object class="GtkScale" id="transition_scale">
+        <property name="width_request">200</property>
+        <property name="visible">True</property>
+        <property name="can_focus">True</property>
+        <property name="hexpand">True</property>
+        <property name="round_digits">1</property>
+        <property name="digits">0</property>
+        <property name="value_pos">left</property>
       </object>
       <packing>
         <property name="left_attach">1</property>

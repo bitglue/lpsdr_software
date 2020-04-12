@@ -7,7 +7,7 @@
 #include <gnuradio/hier_block2.h>
 #include <gtkmm/adjustment.h>
 #include <gtkmm/builder.h>
-#include <gtkmm/spinbutton.h>
+#include <gtkmm/scale.h>
 
 class SSBDemod : virtual public gr::hier_block2 {
 public:
@@ -37,7 +37,7 @@ private:
   SSB(bool lower_sideband);
   Glib::RefPtr<Gtk::Builder> m_builder;
   Glib::RefPtr<Gtk::Adjustment> m_lower, m_upper, m_transition;
-  Gtk::SpinButton *m_lower_spin, *m_upper_spin, *m_transition_spin;
+  Gtk::Scale *m_lower_scale, *m_upper_scale, *m_transition_scale;
   SSBDemod::sptr m_demod;
   bool m_lower_sideband;
 
