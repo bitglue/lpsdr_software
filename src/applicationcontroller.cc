@@ -1,6 +1,7 @@
 #include "applicationcontroller.h"
 #include "config.h"
 #include "mode/ssb.h"
+#include "mode/wspr.h"
 #include "rig/iqonly.h"
 #include "rig/softrock.h"
 #include "rig/test.h"
@@ -39,6 +40,7 @@ ApplicationController::ApplicationController()
 
   mode_combo->append("LSB");
   mode_combo->append("USB");
+  mode_combo->append("WSPR");
 
   run_button->signal_toggled().connect(
       sigc::mem_fun(*this, &ApplicationController::on_run_button_toggled));
@@ -131,6 +133,8 @@ void ApplicationController::on_mode_changed() {
     set_mode(SSB::make(false));
   } else if (selected_mode == "LSB") {
     set_mode(SSB::make(true));
+  } else if (selected_mode == "WSPR") {
+    set_mode(WSPR::make());
   }
 }
 
