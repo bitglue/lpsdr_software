@@ -53,13 +53,13 @@ void Flowgraph::set_demod(gr::basic_block_sptr demod) {
   auto flowgraph_lock = gr_lock(to_top_block());
   auto old_demod = m_demod;
 
-  if (old_demod) {
-    disconnect(old_demod);
+  if (m_audio_sink) {
+    disconnect(m_audio_sink);
+    m_audio_sink = nullptr;
   }
 
-  // TODO: decouple sinks, and allow for different kinds
-  if (not m_audio_sink) {
-    m_audio_sink = gr::audio::sink::make(sample_rate);
+  if (old_demod) {
+    disconnect(old_demod);
   }
 
   m_demod = demod;
@@ -78,6 +78,12 @@ void Flowgraph::make_connections() {
 
   if (m_demod) {
     connect(m_source, 0, m_demod, 0);
-    connect(m_demod, 0, m_audio_sink, 0);
+
+    // TODO: implement some interface for demodulators to specify the kind of
+    // sink they need
+    if (m_demod->output_signature()->min_streams()) {
+      m_audio_sink = gr::audio::sink::make(sample_rate);
+      connect(m_demod, 0, m_audio_sink, 0);
+    }
   }
 }

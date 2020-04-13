@@ -7,6 +7,7 @@ bin_PROGRAMS = lpsdr
 gresource_files = \
     iq_audio.glade \
     mode/ssb.glade \
+    mode/wspr.glade \
     test_rig.glade \
     ui.glade
 
@@ -32,9 +33,12 @@ liblpsdr_a_SOURCES = \
     gresources.h \
     gresources.xml \
     gr_lock.h \
+    jtinterval.h \
     mode/mode.h \
     mode/ssb.cc \
     mode/ssb.h \
+    mode/wspr.cc \
+    mode/wspr.h \
     rig/iq_audio_source.cc \
     rig/iq_audio_source.h \
     rig/iqonly.cc \
@@ -84,6 +88,6 @@ lpsdr_LDADD += @PIGPIO_LIBS@
 endif
 
 lpsdr_SOURCES = main.cc
-catch2_SOURCES = catch.hpp catch2_main.cc
+catch2_SOURCES = catch.hpp catch2_main.cc mode/wspr-test.cc jtinterval-test.cc
 catch2_LDADD = $(lpsdr_LDADD)
 TESTS = catch2
