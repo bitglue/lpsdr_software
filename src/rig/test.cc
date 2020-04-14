@@ -5,7 +5,8 @@
 TestRig::TestRig() {
   m_source = test_source::make();
 
-  auto builder = Gtk::Builder::create_from_file("src/test_rig.glade");
+  auto builder =
+      Gtk::Builder::create_from_resource("/com/bitglue/LPSDR/test_rig.glade");
   builder->get_widget("settings_window", m_settings_window);
 }
 

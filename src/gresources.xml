@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gresources>
+  <gresource prefix="/com/bitglue/LPSDR/">
+    <file>iq_audio.glade</file>
+    <file>mode/ssb.glade</file>
+    <file>test_rig.glade</file>
+    <file>ui.glade</file>
+  </gresource>
+</gresources>

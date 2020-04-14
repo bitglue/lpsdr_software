@@ -17,7 +17,8 @@ ApplicationController::ApplicationController()
       rig(new TestRig()) {
   flowgraph = Flowgraph::make(rig->source());
 
-  auto builder = Gtk::Builder::create_from_file("src/ui.glade");
+  auto builder =
+      Gtk::Builder::create_from_resource("/com/bitglue/LPSDR/ui.glade");
   builder->get_widget("range_scale", range_scale);
   builder->get_widget("sensitivity_scale", sensitivity_scale);
   builder->get_widget("run_button", run_button);

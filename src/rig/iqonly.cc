@@ -8,7 +8,8 @@ IQOnly::IQOnly()
       m_delay_adjustment(Gtk::Adjustment::create(1, -10, 10, 1)) {
   m_source = iq_audio_source::make();
 
-  auto builder = Gtk::Builder::create_from_file("src/iq_audio.glade");
+  auto builder =
+      Gtk::Builder::create_from_resource("/com/bitglue/LPSDR/iq_audio.glade");
   builder->get_widget("settings_window", m_settings_window);
   builder->get_widget("delay_spin", m_delay_spin);
   builder->get_widget("magnitude_scale", m_magnitude_scale);

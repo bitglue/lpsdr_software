@@ -10,6 +10,8 @@
 /compile
 /test-driver
 /src/lpsdr
+/src/gresources.cc
+/src/gresources.h
 /src/catch2
 /src/catch2.trs
 /src/catch2.log

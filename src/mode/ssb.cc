@@ -46,7 +46,8 @@ SSB::SSB(bool lower_sideband)
       m_upper(Gtk::Adjustment::create(3000, 10, 10000)),
       m_transition(Gtk::Adjustment::create(300, 100, 1000)),
       m_lower_sideband(lower_sideband) {
-  m_builder = Gtk::Builder::create_from_file("src/mode/ssb.glade");
+  m_builder =
+      Gtk::Builder::create_from_resource("/com/bitglue/LPSDR/mode/ssb.glade");
 
   m_builder->get_widget("lower_scale", m_lower_scale);
   m_builder->get_widget("upper_scale", m_upper_scale);
