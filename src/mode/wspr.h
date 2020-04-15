@@ -4,6 +4,7 @@
 #include "jtinterval.h"
 #include "mode/mode.h"
 #include <chrono>
+#include <glibmm.h>
 #include <gnuradio/blocks/complex_to_real.h>
 #include <gnuradio/blocks/wavfile_sink.h>
 #include <gnuradio/filter/rational_resampler_base_ccc.h>
@@ -43,12 +44,15 @@ private:
   sigc::connection m_interval_timer_conn;
   const std::string wav_dir();
   const std::string filename_for_interval(unsigned);
-  std::string m_last_file;
+  std::string m_recoding_file;
+  std::string m_decoding_file;
+  Glib::RefPtr<Glib::IOChannel> m_wsprd_stdout_channel;
 
   WSPR();
   bool on_update_progress();
   bool on_start_recording();
   bool on_finish_recording();
+  bool on_wsprd_output(Glib::IOCondition io_condition);
 };
 
 #endif

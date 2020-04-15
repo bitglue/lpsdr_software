@@ -27,6 +27,7 @@ WSPR::WSPR() : m_interval(std::chrono::seconds(120)) {
 }
 
 WSPR::~WSPR() {
+  // TODO: delete recording, if in progress
   m_progress_timer_conn.disconnect();
   m_interval_timer_conn.disconnect();
 }
@@ -43,9 +44,8 @@ bool WSPR::on_update_progress() {
 }
 
 bool WSPR::on_start_recording() {
-  m_last_file = filename_for_interval(m_interval.number());
-  std::cout << "start recording " << m_last_file << "\n";
-  m_demod->open(m_last_file.c_str());
+  m_recoding_file = filename_for_interval(m_interval.number());
+  m_demod->open(m_recoding_file.c_str());
 
   // The transmission is 110.6 seconds long, and starts nominally one second
   // into the interval, so should be done by 111.6 seconds. But we opt to copy
@@ -58,18 +58,64 @@ bool WSPR::on_start_recording() {
 }
 
 bool WSPR::on_finish_recording() {
-  if (m_last_file.empty()) {
-    std::cout << "no recording to finish\n";
-  } else {
-    std::cout << "finish recording " << m_last_file << "\n";
-  }
-
+  // schedule start of next interval
   auto ms_to_start = std::chrono::duration_cast<std::chrono::milliseconds>(
                          m_interval.until_next())
                          .count();
   m_interval_timer_conn = Glib::signal_timeout().connect(
       sigc::mem_fun(*this, &WSPR::on_start_recording), ms_to_start);
+
+  if (m_recoding_file.empty()) {
+    // No file was recorded. The constructor calls on_finish_recording() to
+    // schedule the start of the first interval.
+    return false;
+  }
+
+  if (m_wsprd_stdout_channel) {
+    std::cerr << "A wsprd subprocess is still running. Skipping "
+              << m_recoding_file << std::endl;
+    return false;
+  }
+
+  m_demod->open("/dev/null");
+  m_decoding_file = m_recoding_file;
+  std::cerr << "Decoding " << m_decoding_file << std::endl;
+
+  int wsprd_stdout;
+  auto flags = Glib::SpawnFlags::SPAWN_SEARCH_PATH |
+               Glib::SpawnFlags::SPAWN_CLOEXEC_PIPES;
+  auto argv = std::list<std::string>{"wsprd", m_decoding_file.c_str()};
+  Glib::spawn_async_with_pipes(
+      wav_dir(), // working directory
+      argv, flags,
+      Glib::SlotSpawnChildSetup(), // child setup (default value)
+      nullptr,                     // PID (we don't need it)
+      nullptr,                     // stdin
+      &wsprd_stdout,               // stdout
+      nullptr                      // stderr
+  );
+  m_wsprd_stdout_channel = Glib::IOChannel::create_from_fd(wsprd_stdout);
+
+  Glib::signal_io().connect(sigc::mem_fun(*this, &WSPR::on_wsprd_output),
+                            wsprd_stdout, Glib::IO_IN | Glib::IO_HUP);
+
   return false;
+}
+
+bool WSPR::on_wsprd_output(Glib::IOCondition io_condition) {
+  if (io_condition & Glib::IO_IN) {
+    Glib::ustring buf;
+
+    m_wsprd_stdout_channel->read_line(buf);
+    std::cout << "wsprd: " << buf;
+  }
+  if (io_condition & Glib::IO_HUP) {
+    m_wsprd_stdout_channel->close();
+    m_wsprd_stdout_channel.reset();
+    remove(m_decoding_file.c_str());
+    return false;
+  }
+  return true;
 }
 
 const std::string WSPR::wav_dir() { return "/tmp/lpsdr"; }
