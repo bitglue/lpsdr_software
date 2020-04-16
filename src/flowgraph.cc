@@ -2,15 +2,14 @@
 #include "config.h"
 #include "gr_lock.h"
 
-// TODO: don't hardcode this
-static const int sample_rate = 48000;
-
-Flowgraph::sptr Flowgraph::make(gr::basic_block_sptr source) {
-  return gnuradio::get_initial_sptr(new Flowgraph(source));
+Flowgraph::sptr Flowgraph::make(gr::basic_block_sptr source,
+                                unsigned sample_rate) {
+  return gnuradio::get_initial_sptr(new Flowgraph(source, sample_rate));
 }
 
-Flowgraph::Flowgraph(gr::basic_block_sptr source)
-    : gr::top_block(PACKAGE_NAME), m_source(source) {
+Flowgraph::Flowgraph(gr::basic_block_sptr source, unsigned sample_rate)
+    : gr::top_block(PACKAGE_NAME), m_source(source),
+      m_sample_rate(sample_rate) {
   waterfall_sink = dispatcher_sink::make();
   make_connections();
 }
@@ -82,7 +81,7 @@ void Flowgraph::make_connections() {
     // TODO: implement some interface for demodulators to specify the kind of
     // sink they need
     if (m_demod->output_signature()->min_streams()) {
-      m_audio_sink = gr::audio::sink::make(sample_rate);
+      m_audio_sink = gr::audio::sink::make(m_sample_rate);
       connect(m_demod, 0, m_audio_sink, 0);
     }
   }

@@ -3,21 +3,23 @@
 #include <gnuradio/filter/firdes.h>
 #include <gnuradio/io_signature.h>
 
-static const int sample_rate = 48000;
-
-iq_audio_source::sptr iq_audio_source::make(const std::string device_name) {
-  return gnuradio::get_initial_sptr(new iq_audio_source_impl(device_name));
+iq_audio_source::sptr iq_audio_source::make(unsigned sample_rate,
+                                            const std::string device_name) {
+  return gnuradio::get_initial_sptr(
+      new iq_audio_source_impl(sample_rate, device_name));
 }
 
-iq_audio_source_impl::iq_audio_source_impl(const std::string device_name)
+iq_audio_source_impl::iq_audio_source_impl(unsigned sample_rate,
+                                           const std::string device_name)
     : gr::hier_block2("iq_audio_source", gr::io_signature::make(0, 0, 0),
-                      gr::io_signature::make(1, 1, sizeof(gr_complex))) {
-  audio_source = gr::audio::source::make(sample_rate, device_name, true);
+                      gr::io_signature::make(1, 1, sizeof(gr_complex))),
+      m_sample_rate(sample_rate) {
+  audio_source = gr::audio::source::make(m_sample_rate, device_name, true);
   m_device_name = device_name;
   delay = gr::blocks::delay::make(sizeof(float), 0);
   float_to_complex = gr::blocks::float_to_complex::make();
 
-  auto taps = gr::filter::firdes::high_pass_2(1, sample_rate, 1800, 2500, 65);
+  auto taps = gr::filter::firdes::high_pass_2(1, m_sample_rate, 1800, 2500, 65);
   mains_hum_filter = gr::filter::fir_filter_ccf::make(1, taps);
 
   iqbal_fix = gr::iqbalance::fix_cc::make(0, 0);
@@ -40,7 +42,7 @@ void iq_audio_source_impl::connect_audio_source() {
 void iq_audio_source_impl::set_audio_device(const std::string device_name) {
   auto lock = gr_lock(this->to_hier_block2());
   auto new_audio_source =
-      gr::audio::source::make(sample_rate, device_name, true);
+      gr::audio::source::make(m_sample_rate, device_name, true);
 
   disconnect(audio_source);
   audio_source = new_audio_source;

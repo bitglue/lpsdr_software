@@ -11,11 +11,10 @@ class Flowgraph : public gr::top_block {
 public:
   typedef boost::shared_ptr<Flowgraph> sptr;
 
-  Flowgraph(gr::basic_block_sptr source);
   virtual ~Flowgraph();
   dispatcher_sink::signal_fft_done_t signal_fft_done();
 
-  static sptr make(gr::basic_block_sptr source);
+  static sptr make(gr::basic_block_sptr source, unsigned sample_rate);
   void set_source(gr::basic_block_sptr);
   void enable_udp_debug(const std::string &host, int port,
                         int payload_size = 1472, bool eof = true);
@@ -27,7 +26,9 @@ protected:
   dispatcher_sink::sptr waterfall_sink;
   gr::blocks::udp_sink::sptr m_udp_sink;
   gr::audio::sink::sptr m_audio_sink;
+  const unsigned m_sample_rate;
 
+  Flowgraph(gr::basic_block_sptr source, unsigned sample_rate);
   void make_connections();
 };
 

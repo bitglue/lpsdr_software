@@ -6,7 +6,7 @@
 
 class Softrock : public IQOnly {
 public:
-  Softrock();
+  Softrock(unsigned sample_rate);
   void set_freq(double);
   double get_freq();
 

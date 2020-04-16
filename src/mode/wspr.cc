@@ -7,13 +7,13 @@
 const unsigned wsprd_sample_rate = 12000;
 const unsigned wsprd_bit_depth = 16;
 
-// TODO: don't hardcode
-const unsigned sample_rate = 48000;
+WSPR::sptr WSPR::make(unsigned sample_rate) {
+  return sptr(new WSPR(sample_rate));
+}
 
-WSPR::sptr WSPR::make() { return sptr(new WSPR()); }
-
-WSPR::WSPR() : m_interval(std::chrono::seconds(120)), m_wav_dir("/tmp/lpsdr") {
-  m_demod = WSPRDemod::make();
+WSPR::WSPR(unsigned sample_rate)
+    : m_interval(std::chrono::seconds(120)), m_wav_dir("/tmp/lpsdr") {
+  m_demod = WSPRDemod::make(sample_rate);
 
   m_builder =
       Gtk::Builder::create_from_resource("/com/bitglue/LPSDR/mode/wspr.glade");
@@ -176,9 +176,11 @@ std::vector<gr_complex> WSPRDemod::design_filter(unsigned interpolation,
 
 gr::basic_block_sptr WSPR::demod() { return m_demod; }
 
-WSPRDemod::sptr WSPRDemod::make() { return sptr(new WSPRDemod()); }
+WSPRDemod::sptr WSPRDemod::make(unsigned sample_rate) {
+  return sptr(new WSPRDemod(sample_rate));
+}
 
-WSPRDemod::WSPRDemod()
+WSPRDemod::WSPRDemod(unsigned sample_rate)
     : gr::hier_block2("WSPRDemod",
                       gr::io_signature::make(1, 1, sizeof(gr_complex)),
                       gr::io_signature::make(0, 0, 0)) {

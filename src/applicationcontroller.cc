@@ -11,12 +11,14 @@
 #include "rig/breadboard.h"
 #endif
 
+const unsigned sample_rate = 48000;
+
 ApplicationController::ApplicationController()
     : sensitivity_adjustment(Gtk::Adjustment::create(-110, -120, 0)),
       range_adjustment(Gtk::Adjustment::create(40, 1, 100)),
       freq_adjustment(Gtk::Adjustment::create(14e6, 0, 30e6)),
       rig(new TestRig()) {
-  flowgraph = Flowgraph::make(rig->source());
+  flowgraph = Flowgraph::make(rig->source(), sample_rate);
 
   auto builder =
       Gtk::Builder::create_from_resource("/com/bitglue/LPSDR/ui.glade");
@@ -37,6 +39,7 @@ ApplicationController::ApplicationController()
   sensitivity_scale->set_adjustment(sensitivity_adjustment);
   m_freq_spin->set_adjustment(freq_adjustment);
   waterfall->set_adjustment(freq_adjustment);
+  waterfall->set_bandwidth(sample_rate);
 
   mode_combo->append("LSB");
   mode_combo->append("USB");
@@ -111,13 +114,13 @@ void ApplicationController::on_rig_changed() {
   if (selected_rig == "Test") {
     rig.reset(new TestRig());
   } else if (selected_rig == "Softrock") {
-    rig.reset(new Softrock());
+    rig.reset(new Softrock(sample_rate));
 #ifdef HAVE_BREADBOARD
   } else if (selected_rig == "Breadboard") {
     rig.reset(new Breadboard());
 #endif
   } else if (selected_rig == "IQ Only") {
-    rig.reset(new IQOnly());
+    rig.reset(new IQOnly(sample_rate));
   }
   on_freq_changed();
   flowgraph->set_source(rig->source());
@@ -130,11 +133,11 @@ void ApplicationController::on_rig_settings_clicked() {
 void ApplicationController::on_mode_changed() {
   auto selected_mode = mode_combo->get_active_text();
   if (selected_mode == "USB") {
-    set_mode(SSB::make(false));
+    set_mode(SSB::make(sample_rate, false));
   } else if (selected_mode == "LSB") {
-    set_mode(SSB::make(true));
+    set_mode(SSB::make(sample_rate, true));
   } else if (selected_mode == "WSPR") {
-    set_mode(WSPR::make());
+    set_mode(WSPR::make(sample_rate));
   }
 }
 

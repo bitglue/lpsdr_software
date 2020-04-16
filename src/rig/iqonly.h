@@ -11,7 +11,7 @@
 
 class IQOnly : public LPSDRRig {
 public:
-  IQOnly();
+  IQOnly(unsigned sample_rate);
   gr::basic_block_sptr source();
   void set_freq(double);
   double get_freq();

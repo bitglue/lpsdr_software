@@ -2,9 +2,6 @@
 #include <gnuradio/filter/firdes.h>
 #include <gtkmm/button.h>
 
-// TODO: don't hardcode
-const float sample_rate = 48000;
-
 SSBDemod::sptr SSBDemod::make() {
   return gnuradio::get_initial_sptr(new SSBDemod());
 }
@@ -14,7 +11,7 @@ SSBDemod::SSBDemod()
                       gr::io_signature::make(1, 1, sizeof(gr_complex)),
                       gr::io_signature::make(1, 1, sizeof(float))) {
 
-  auto taps = make_taps(sample_rate, 300, 3000, 300);
+  auto taps = std::vector<gr_complex>{1};
   m_filter = gr::filter::fft_filter_ccc::make(1, taps);
   m_to_float = gr::blocks::complex_to_float::make();
   connect(self(), 0, m_filter, 0);
@@ -37,15 +34,15 @@ void SSBDemod::set_taps(double samp_rate, double low_cutoff, double high_cutoff,
   m_filter->set_taps(taps);
 }
 
-SSB::sptr SSB::make(bool lower_sideband) {
-  return SSB::sptr(new SSB(lower_sideband));
+SSB::sptr SSB::make(unsigned sample_rate, bool lower_sideband) {
+  return SSB::sptr(new SSB(sample_rate, lower_sideband));
 }
 
-SSB::SSB(bool lower_sideband)
+SSB::SSB(unsigned sample_rate, bool lower_sideband)
     : m_lower(Gtk::Adjustment::create(300, 0, 500)),
       m_upper(Gtk::Adjustment::create(3000, 10, 10000)),
       m_transition(Gtk::Adjustment::create(300, 100, 1000)),
-      m_lower_sideband(lower_sideband) {
+      m_lower_sideband(lower_sideband), m_sample_rate(sample_rate) {
   m_builder =
       Gtk::Builder::create_from_resource("/com/bitglue/LPSDR/mode/ssb.glade");
 
@@ -89,5 +86,5 @@ void SSB::on_filter_changed() {
     low_cutoff = -m_upper->get_value();
   }
 
-  m_demod->set_taps(sample_rate, low_cutoff, high_cutoff, transition);
+  m_demod->set_taps(m_sample_rate, low_cutoff, high_cutoff, transition);
 }

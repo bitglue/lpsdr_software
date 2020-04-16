@@ -2,11 +2,11 @@
 #include <glibmm/main.h>
 #include <gtkmm/builder.h>
 
-IQOnly::IQOnly()
+IQOnly::IQOnly(unsigned sample_rate)
     : m_magnitude_adjustment(Gtk::Adjustment::create(0, -0.5, 0.5, 0.000001)),
       m_phase_adjustment(Gtk::Adjustment::create(0, -0.5, 0.5, 0.000001)),
       m_delay_adjustment(Gtk::Adjustment::create(1, -10, 10, 1)) {
-  m_source = iq_audio_source::make();
+  m_source = iq_audio_source::make(sample_rate);
 
   auto builder =
       Gtk::Builder::create_from_resource("/com/bitglue/LPSDR/iq_audio.glade");

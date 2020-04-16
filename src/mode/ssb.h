@@ -29,17 +29,18 @@ private:
 class SSB : virtual public Mode {
 public:
   typedef std::shared_ptr<SSB> sptr;
-  static sptr make(bool lower_sideband);
+  static sptr make(unsigned sample_rate, bool lower_sideband);
   gr::basic_block_sptr demod();
   Gtk::Widget &settings_widget();
 
 private:
-  SSB(bool lower_sideband);
+  SSB(unsigned sample_rate, bool lower_sideband);
   Glib::RefPtr<Gtk::Builder> m_builder;
   Glib::RefPtr<Gtk::Adjustment> m_lower, m_upper, m_transition;
   Gtk::Scale *m_lower_scale, *m_upper_scale, *m_transition_scale;
   SSBDemod::sptr m_demod;
   bool m_lower_sideband;
+  const unsigned m_sample_rate;
 
   void on_filter_changed();
 };

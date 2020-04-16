@@ -23,6 +23,7 @@ public:
   void set_sensitivity(float);
   void set_range(float);
   void set_adjustment(const Glib::RefPtr<Gtk::Adjustment> &adjustment);
+  void set_bandwidth(unsigned bw);
 
   float get_bottom_freq() { return bottom_freq; };
   float get_top_freq() { return top_freq; };
@@ -51,6 +52,7 @@ protected:
   float gesture_begin_top_freq;
   float fft_min;
   float fft_scale;
+  unsigned m_bandwidth;
 
   Glib::RefPtr<Gtk::GestureZoom> gesture_zoom;
   Glib::RefPtr<Gtk::GesturePan> gesture_pan;

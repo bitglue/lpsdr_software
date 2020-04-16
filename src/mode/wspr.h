@@ -14,11 +14,11 @@
 class WSPRDemod : virtual public gr::hier_block2 {
 public:
   typedef boost::shared_ptr<WSPRDemod> sptr;
-  static sptr make();
+  static sptr make(unsigned sample_rate);
   bool open(const char *filename);
 
 private:
-  WSPRDemod();
+  WSPRDemod(unsigned sample_rate);
   gr::filter::rational_resampler_base_ccc::sptr m_resampler;
   gr::blocks::complex_to_real::sptr m_to_real;
   gr::blocks::wavfile_sink::sptr m_wav_sink;
@@ -30,7 +30,7 @@ private:
 class WSPR : virtual public Mode {
 public:
   typedef std::shared_ptr<WSPR> sptr;
-  static sptr make();
+  static sptr make(unsigned sample_rate);
   gr::basic_block_sptr demod();
   Gtk::Widget &settings_widget();
   ~WSPR();
@@ -47,7 +47,7 @@ private:
   std::string m_wav_dir;
   Glib::RefPtr<Glib::IOChannel> m_wsprd_stdout_channel;
 
-  WSPR();
+  WSPR(unsigned sample_rate);
   std::string wav_dir() const;
   std::string filename_for_interval(unsigned) const;
   bool on_update_progress();

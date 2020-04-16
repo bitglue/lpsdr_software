@@ -7,13 +7,11 @@
 #include <glibmm/main.h>
 #include <gtkmm/widget.h>
 
-// TODO: don't hardcode this. Have to do some thinking about how to determine
-// the waterfall width, and implement zooming.
-const unsigned sample_rate = 48000;
+const unsigned default_bandwidth = 48000;
 
 Waterfall::Waterfall(Gtk::DrawingArea::BaseObjectType *cobject,
                      const Glib::RefPtr<Gtk::Builder> &)
-    : Gtk::DrawingArea(cobject), bottom_freq(0), top_freq(sample_rate),
+    : Gtk::DrawingArea(cobject), bottom_freq(0), top_freq(default_bandwidth),
       swipe_velocity(0), fft_min(-120), fft_scale(40) {
   // add_tick_callback(sigc::mem_fun(*this, &Waterfall::on_tick));
 
@@ -264,9 +262,14 @@ void Waterfall::set_adjustment(
   on_freq_changed();
 }
 
+void Waterfall::set_bandwidth(unsigned bw) {
+  m_bandwidth = bw;
+  on_freq_changed();
+}
+
 void Waterfall::on_freq_changed() {
   auto freq = m_adjustment->get_value();
-  bottom_freq = freq - sample_rate / 2;
-  top_freq = freq + sample_rate / 2;
+  bottom_freq = freq - m_bandwidth / 2;
+  top_freq = freq + m_bandwidth / 2;
   queue_draw();
 }

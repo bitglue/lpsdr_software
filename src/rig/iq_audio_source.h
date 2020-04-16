@@ -12,7 +12,7 @@
 class iq_audio_source : virtual public gr::hier_block2 {
 public:
   typedef boost::shared_ptr<iq_audio_source> sptr;
-  static sptr make(const std::string device_name = "");
+  static sptr make(unsigned sample_rate, const std::string device_name = "");
 
   virtual void set_dly(int d) = 0;
   virtual void set_iq_correction(float mag, float phase) = 0;
@@ -26,7 +26,8 @@ public:
 
 class iq_audio_source_impl : public iq_audio_source {
 public:
-  iq_audio_source_impl(const std::string device_name = "");
+  iq_audio_source_impl(unsigned sample_rate,
+                       const std::string device_name = "");
   ~iq_audio_source_impl();
 
   void set_dly(int d);
@@ -39,6 +40,7 @@ public:
   const std::string device_name() const { return m_device_name; };
 
 protected:
+  const unsigned m_sample_rate;
   gr::audio::source::sptr audio_source;
   gr::blocks::float_to_complex::sptr float_to_complex;
 
