@@ -12,7 +12,11 @@ WSPR::sptr WSPR::make(unsigned sample_rate) {
 }
 
 WSPR::WSPR(unsigned sample_rate)
-    : m_interval(std::chrono::seconds(120)), m_wav_dir("/tmp/lpsdr") {
+    : Glib::ObjectBase(typeid(WSPR)), m_interval(std::chrono::seconds(120)),
+      m_wav_dir("/tmp/lpsdr"), m_sample_rate(sample_rate),
+      m_lower_cutoff(*this, "lower-cutoff", 1500 - 150),
+      m_upper_cutoff(*this, "upper-cutoff", 1500 + 150),
+      m_carrier_offset(*this, "carrier-offset") {
   m_demod = WSPRDemod::make(sample_rate);
 
   m_builder =
@@ -21,6 +25,8 @@ WSPR::WSPR(unsigned sample_rate)
 
   m_progress_timer_conn = Glib::signal_timeout().connect(
       sigc::mem_fun(*this, &WSPR::on_update_progress), 250);
+  property_carrier_offset().signal_changed().connect(
+      sigc::mem_fun(*this, &WSPR::on_carrier_offset_changed));
 
   // this will start the timers running
   on_finish_recording();
@@ -184,7 +190,6 @@ WSPRDemod::WSPRDemod(unsigned sample_rate)
     : gr::hier_block2("WSPRDemod",
                       gr::io_signature::make(1, 1, sizeof(gr_complex)),
                       gr::io_signature::make(0, 0, 0)) {
-
   unsigned interpolation = wsprd_sample_rate;
   unsigned decimation = sample_rate;
   unsigned gcd = std::__gcd(interpolation, decimation);
@@ -193,17 +198,33 @@ WSPRDemod::WSPRDemod(unsigned sample_rate)
 
   auto taps = design_filter(interpolation, decimation);
 
+  m_rotator = gr::blocks::rotator_cc::make();
   m_resampler = gr::filter::rational_resampler_base_ccc::make(interpolation,
                                                               decimation, taps);
   m_to_real = gr::blocks::complex_to_real::make();
   m_wav_sink = gr::blocks::wavfile_sink::make("/dev/null", 1, wsprd_sample_rate,
                                               wsprd_bit_depth);
 
-  connect(self(), 0, m_resampler, 0);
+  connect(self(), 0, m_rotator, 0);
+  connect(m_rotator, 0, m_resampler, 0);
   connect(m_resampler, 0, m_to_real, 0);
   connect(m_to_real, 0, m_wav_sink, 0);
 }
 
 bool WSPRDemod::open(const char *filename) {
   return m_wav_sink->open(filename);
+}
+
+void WSPR::on_carrier_offset_changed() {
+  m_demod->set_phase_inc(-carrier_offset() / m_sample_rate * 2 * M_PI);
+}
+
+Glib::PropertyProxy<double> WSPR::property_lower_cutoff() {
+  return m_lower_cutoff.get_proxy();
+}
+Glib::PropertyProxy<double> WSPR::property_upper_cutoff() {
+  return m_upper_cutoff.get_proxy();
+}
+Glib::PropertyProxy<double> WSPR::property_carrier_offset() {
+  return m_carrier_offset.get_proxy();
 }

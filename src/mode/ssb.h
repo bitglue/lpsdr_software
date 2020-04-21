@@ -2,7 +2,9 @@
 #define LPSDR_MODE_SSB_H
 
 #include "mode/mode.h"
+#include <glibmm/property.h>
 #include <gnuradio/blocks/complex_to_float.h>
+#include <gnuradio/blocks/rotator_cc.h>
 #include <gnuradio/filter/fft_filter_ccc.h>
 #include <gnuradio/hier_block2.h>
 #include <gtkmm/adjustment.h>
@@ -15,6 +17,7 @@ public:
   static sptr make();
   void set_taps(double samp_rate, double low_cutoff, double high_cutoff,
                 double transition);
+  void set_phase_inc(double p) { m_rotator->set_phase_inc(p); };
 
 private:
   SSBDemod();
@@ -22,7 +25,8 @@ private:
   static std::vector<gr_complex> make_taps(double samp_rate, double low_cutoff,
                                            double high_cutoff,
                                            double transition);
-  boost::shared_ptr<gr::filter::fft_filter_ccc> m_filter;
+  gr::blocks::rotator_cc::sptr m_rotator;
+  gr::filter::fft_filter_ccc::sptr m_filter;
   gr::blocks::complex_to_float::sptr m_to_float;
 };
 
@@ -33,8 +37,12 @@ public:
   gr::basic_block_sptr demod();
   Gtk::Widget &settings_widget();
 
+  Glib::PropertyProxy<double> property_lower_cutoff() override;
+  Glib::PropertyProxy<double> property_upper_cutoff() override;
+  Glib::PropertyProxy<double> property_carrier_offset() override;
+
 private:
-  SSB(unsigned sample_rate, bool lower_sideband);
+  Glib::Property<double> m_carrier_offset;
   Glib::RefPtr<Gtk::Builder> m_builder;
   Glib::RefPtr<Gtk::Adjustment> m_lower, m_upper, m_transition;
   Gtk::Scale *m_lower_scale, *m_upper_scale, *m_transition_scale;
@@ -42,7 +50,9 @@ private:
   bool m_lower_sideband;
   const unsigned m_sample_rate;
 
+  SSB(unsigned sample_rate, bool lower_sideband);
   void on_filter_changed();
+  void on_carrier_offset_changed();
 };
 
 #endif

@@ -28,18 +28,27 @@ ApplicationController::ApplicationController()
   builder->get_widget("band_down_button", band_down_button);
   builder->get_widget("band_up_button", band_up_button);
   builder->get_widget("rig_settings_button", rig_settings_button);
-  builder->get_widget_derived("waterfall", waterfall);
   builder->get_widget("mainwindow", main_window);
   builder->get_widget("rig_selector", rig_selector);
   builder->get_widget("mode_combo", mode_combo);
   builder->get_widget("freq_spin", m_freq_spin);
   builder->get_widget("mode_box", m_mode_box);
+  builder->get_widget("settings_button_box", m_settings_button_box);
+  builder->get_widget("overlay", m_overlay);
+
+  m_filter_area.set_halign(Gtk::Align::ALIGN_START);
+  m_overlay->add(waterfall);
+  m_overlay->add_overlay(m_filter_area);
+  m_overlay->reorder_overlay(m_filter_area, 0);
+  m_overlay->reorder_overlay(*m_settings_button_box, 1);
+  m_overlay->show_all();
+
+  create_bindings();
 
   range_scale->set_adjustment(range_adjustment);
   sensitivity_scale->set_adjustment(sensitivity_adjustment);
   m_freq_spin->set_adjustment(freq_adjustment);
-  waterfall->set_adjustment(freq_adjustment);
-  waterfall->set_bandwidth(sample_rate);
+  waterfall.set_bandwidth(sample_rate);
 
   mode_combo->append("LSB");
   mode_combo->append("USB");
@@ -78,6 +87,26 @@ ApplicationController::~ApplicationController() {
   delete main_window;
 }
 
+void ApplicationController::create_bindings() {
+  // frequency spinner <=> waterfall center freq
+  m_bindings.push_back(Glib::Binding::bind_property(
+      freq_adjustment->property_value(), waterfall.property_center(),
+      Glib::BindingFlags::BINDING_BIDIRECTIONAL |
+          Glib::BindingFlags::BINDING_SYNC_CREATE));
+
+  // waterfall => filter area, for center, bandwidth, and px_per_hz
+  m_bindings.push_back(Glib::Binding::bind_property(
+      waterfall.property_center(), m_filter_area.property_waterfall_center(),
+      Glib::BindingFlags::BINDING_SYNC_CREATE));
+  m_bindings.push_back(
+      Glib::Binding::bind_property(waterfall.property_bandwidth(),
+                                   m_filter_area.property_waterfall_bandwidth(),
+                                   Glib::BindingFlags::BINDING_SYNC_CREATE));
+  m_bindings.push_back(Glib::Binding::bind_property(
+      waterfall.property_px_per_hz(), m_filter_area.property_px_per_hz(),
+      Glib::BindingFlags::BINDING_SYNC_CREATE));
+}
+
 bool ApplicationController::on_delete_main_window() {
   flowgraph->stop();
   flowgraph->wait();
@@ -94,15 +123,15 @@ void ApplicationController::on_run_button_toggled() {
 }
 
 void ApplicationController::on_fft_done(float *magnitudes, unsigned size) {
-  waterfall->add_fft(magnitudes, size);
+  waterfall.add_fft(magnitudes, size);
 }
 
 void ApplicationController::on_range_changed() {
-  waterfall->set_range(range_adjustment->get_value());
+  waterfall.set_range(range_adjustment->get_value());
 }
 
 void ApplicationController::on_sensitivity_changed() {
-  waterfall->set_sensitivity(sensitivity_adjustment->get_value());
+  waterfall.set_sensitivity(sensitivity_adjustment->get_value());
 }
 
 void ApplicationController::on_freq_changed() {
@@ -142,6 +171,17 @@ void ApplicationController::on_mode_changed() {
 }
 
 void ApplicationController::set_mode(std::shared_ptr<Mode> mode) {
+  m_mode_bindings.clear();
+  m_mode_bindings.push_back(Glib::Binding::bind_property(
+      mode->property_lower_cutoff(), m_filter_area.property_lower_cutoff(),
+      Glib::BindingFlags::BINDING_SYNC_CREATE));
+  m_mode_bindings.push_back(Glib::Binding::bind_property(
+      mode->property_upper_cutoff(), m_filter_area.property_upper_cutoff(),
+      Glib::BindingFlags::BINDING_SYNC_CREATE));
+  m_mode_bindings.push_back(Glib::Binding::bind_property(
+      m_filter_area.property_carrier_offset(), mode->property_carrier_offset(),
+      Glib::BindingFlags::BINDING_SYNC_CREATE));
+
   auto children = m_mode_box->get_children();
   for (unsigned i = 2; i < children.size(); i++) {
     auto child = children.at(i);

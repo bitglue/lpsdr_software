@@ -7,20 +7,16 @@
 #include <glibmm/main.h>
 #include <gtkmm/widget.h>
 
-const unsigned default_bandwidth = 48000;
-
-Waterfall::Waterfall(Gtk::DrawingArea::BaseObjectType *cobject,
-                     const Glib::RefPtr<Gtk::Builder> &)
-    : Gtk::DrawingArea(cobject), bottom_freq(0), top_freq(default_bandwidth),
+Waterfall::Waterfall()
+    : Glib::ObjectBase(typeid(Waterfall)),
+      m_px_per_hz(
+          *this, "px-per-hz", "pixels per Hz",
+          "The ratio of pixels per Hz, calculated as a function of the "
+          "currently displayed frequency an the widget width. Readonly.",
+          Glib::ParamFlags::PARAM_READABLE),
+      m_center(*this, "center"), m_bandwidth(*this, "bandwidth"),
       swipe_velocity(0), fft_min(-120), fft_scale(40) {
   // add_tick_callback(sigc::mem_fun(*this, &Waterfall::on_tick));
-
-  // gesture_zoom = Gtk::GestureZoom::create(*this);
-  // gesture_zoom->set_propagation_phase(Gtk::PropagationPhase::PHASE_BUBBLE);
-  // gesture_zoom->signal_scale_changed().connect(
-  //    sigc::mem_fun(*this, &Waterfall::on_gesture_zoom));
-  // gesture_zoom->signal_begin().connect(
-  //    sigc::mem_fun(*this, &Waterfall::on_gesture_begin));
 
   gesture_pan =
       Gtk::GesturePan::create(*this, Gtk::Orientation::ORIENTATION_HORIZONTAL);
@@ -42,6 +38,11 @@ Waterfall::Waterfall(Gtk::DrawingArea::BaseObjectType *cobject,
                                   background_height, background_stride);
 
   on_add_fft_dispatcher.connect(sigc::mem_fun(*this, &Waterfall::on_fft_added));
+
+  property_center().signal_changed().connect(
+      sigc::mem_fun(*this, &Waterfall::on_freq_changed));
+
+  on_freq_changed();
 }
 
 Waterfall::~Waterfall() {
@@ -74,7 +75,7 @@ void Waterfall::draw_background(const Cairo::RefPtr<Cairo::Context> &cr) {
 }
 
 void Waterfall::draw_scale(const Cairo::RefPtr<Cairo::Context> &cr) {
-  const float freq_range = top_freq - bottom_freq;
+  const float freq_range = bandwidth();
   float step = 1.0;
   const float label_width = 50;
   const float waterfall_width = get_allocation().get_width();
@@ -89,14 +90,14 @@ void Waterfall::draw_scale(const Cairo::RefPtr<Cairo::Context> &cr) {
     step /= 2;
   }
 
-  for (int i = bottom_freq / step; i * step < top_freq; i++) {
+  for (int i = bottom_freq() / step; i * step < top_freq(); i++) {
     draw_tick(cr, i * step);
   }
 }
 
 void Waterfall::draw_tick(const Cairo::RefPtr<Cairo::Context> &cr, float freq) {
   cr->save();
-  float x = (freq - bottom_freq) / (top_freq - bottom_freq) *
+  float x = (freq - bottom_freq()) / (top_freq() - bottom_freq()) *
             get_allocation().get_width();
   cr->move_to(x, 0);
 
@@ -131,14 +132,10 @@ void Waterfall::draw_tick(const Cairo::RefPtr<Cairo::Context> &cr, float freq) {
 
 void Waterfall::update_kinematics() {
   if (swipe_velocity != 0) {
-    float hz = top_freq - bottom_freq;
+    float hz = bandwidth();
     float hz_per_px = hz / get_allocation().get_width();
 
-    bottom_freq -= hz_per_px * swipe_velocity;
-    top_freq -= hz_per_px * swipe_velocity;
-    if (m_adjustment) {
-      m_adjustment->set_value(get_center_freq());
-    }
+    m_center = center_freq() - hz_per_px * swipe_velocity;
 
     swipe_velocity *= 0.75;
     if (abs(swipe_velocity) < 1.0) {
@@ -160,35 +157,16 @@ bool Waterfall::on_tick(const Glib::RefPtr<Gdk::FrameClock> &) {
 }
 
 void Waterfall::on_gesture_begin(GdkEventSequence *) {
-  gesture_begin_bottom_freq = bottom_freq;
-  gesture_begin_top_freq = top_freq;
+  gesture_begin_center = center_freq();
   swipe_velocity = 0.0;
 }
 
-void Waterfall::on_gesture_zoom(double scale) {
-  float center_freq = (gesture_begin_top_freq + gesture_begin_bottom_freq) / 2;
-  float range = gesture_begin_top_freq - gesture_begin_bottom_freq;
-  range /= scale;
-  top_freq = center_freq + (range / 2);
-  bottom_freq = center_freq - (range / 2);
-  if (m_adjustment) {
-    m_adjustment->set_value(center_freq);
-  }
-  queue_draw();
-}
-
 void Waterfall::on_gesture_pan(Gtk::PanDirection direction, double offset) {
-  float hz = gesture_begin_top_freq - gesture_begin_bottom_freq;
-  float hz_per_px = hz / get_allocation().get_width();
-  float hz_pan = offset * hz_per_px;
+  float hz_pan = px_to_hz(offset);
   if (direction == Gtk::PanDirection::PAN_DIRECTION_RIGHT) {
     hz_pan = -hz_pan;
   }
-  bottom_freq = gesture_begin_bottom_freq + hz_pan;
-  top_freq = gesture_begin_top_freq + hz_pan;
-  if (m_adjustment) {
-    m_adjustment->set_value(get_center_freq());
-  }
+  m_center = gesture_begin_center + hz_pan;
   queue_draw();
 }
 
@@ -228,10 +206,9 @@ void Waterfall::add_fft(float *fft, unsigned size) {
     return;
   }
 
-  memmove(background_data, background_data + background_stride,
+  memmove(background_data + background_stride, background_data,
           background_stride * (background_height - 1));
-  uint32_t *new_row = reinterpret_cast<uint32_t *>(
-      background_data + background_stride * (background_height - 1));
+  uint32_t *new_row = reinterpret_cast<uint32_t *>(background_data);
 
   for (unsigned i = fft_size / 2; i < fft_size; i++) {
     float value = (fft[i] - fft_min) / fft_scale;
@@ -249,27 +226,17 @@ void Waterfall::on_fft_added() { queue_draw(); }
 void Waterfall::set_sensitivity(float sensitivity) { fft_min = sensitivity; }
 void Waterfall::set_range(float range) { fft_scale = range; }
 
-void Waterfall::set_adjustment(
-    const Glib::RefPtr<Gtk::Adjustment> &adjustment) {
-  if (m_adjustment_connection) {
-    m_adjustment_connection.disconnect();
-  }
-
-  m_adjustment = adjustment;
-  m_adjustment_connection = adjustment->signal_value_changed().connect(
-      sigc::mem_fun(*this, &Waterfall::on_freq_changed));
-
-  on_freq_changed();
-}
-
 void Waterfall::set_bandwidth(unsigned bw) {
   m_bandwidth = bw;
   on_freq_changed();
 }
 
+void Waterfall::on_size_allocate(Gtk::Allocation &allocation) {
+  Gtk::DrawingArea::on_size_allocate(allocation);
+  on_freq_changed();
+}
+
 void Waterfall::on_freq_changed() {
-  auto freq = m_adjustment->get_value();
-  bottom_freq = freq - m_bandwidth / 2;
-  top_freq = freq + m_bandwidth / 2;
+  m_px_per_hz = get_allocation().get_width() / bandwidth();
   queue_draw();
 }

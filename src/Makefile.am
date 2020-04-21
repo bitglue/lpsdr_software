@@ -25,6 +25,8 @@ liblpsdr_a_SOURCES = \
     applicationcontroller.h \
     dispatcher_sink.cc \
     dispatcher_sink.h \
+    filterwidget.cc \
+    filterwidget.h \
     flowgraph.cc \
     flowgraph.h \
     freq_db.cc \
