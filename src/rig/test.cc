@@ -13,7 +13,6 @@ TestRig::TestRig() {
 TestRig::~TestRig() { delete (m_settings_window); }
 
 void TestRig::set_freq(double f) {
-  std::cout << "test rig frequency changed to " << f << "\n";
   m_freq = f;
   m_source->set_freq(f);
 }

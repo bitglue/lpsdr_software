@@ -3,7 +3,6 @@
 
 #include "rig.h"
 #include "test_source.h"
-#include <iostream>
 
 class TestRig : public LPSDRRig {
 public:
