@@ -3,6 +3,7 @@ AUTOMAKE_OPTIONS = subdir-objects
 noinst_LIBRARIES = liblpsdr.a
 check_PROGRAMS = catch2
 bin_PROGRAMS = lpsdr
+noinst_PROGRAMS = si5351
 
 gresource_files = \
     iq_audio.glade \
@@ -52,6 +53,8 @@ liblpsdr_a_SOURCES = \
     rig/test.h \
     rig/test_source.cc \
     rig/test_source.h \
+    si5351.cc \
+    si5351.h \
     waterfall.cc \
     waterfall.h
 
@@ -89,8 +92,16 @@ liblpsdr_a_SOURCES += rig/breadboard.cc
 lpsdr_LDADD += @PIGPIO_LIBS@
 endif
 
+si5351_SOURCES = si5351_main.cc
+si5351_LDADD = -lpigpio liblpsdr.a
+
 lpsdr_SOURCES = main.cc
-catch2_SOURCES = catch.hpp catch2_main.cc mode/wspr-test.cc jtinterval-test.cc
+catch2_SOURCES = \
+    catch2_main.cc \
+    catch.hpp \
+    jtinterval-test.cc \
+    mode/wspr-test.cc \
+    si5351-test.cc
 catch2_LDADD = $(lpsdr_LDADD)
 TESTS = catch2
 
