@@ -8,7 +8,7 @@
 #define I2C_READ 0x61
 #define I2C_BUS 1
 
-Breadboard::Breadboard() { pigpio = pigpio_start(NULL, NULL); }
+Breadboard::Breadboard(unsigned sample_rate) : IQOnly(sample_rate) { pigpio = pigpio_start(NULL, NULL); }
 
 Breadboard::~Breadboard() { pigpio_stop(pigpio); }
 

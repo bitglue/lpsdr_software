@@ -146,7 +146,7 @@ void ApplicationController::on_rig_changed() {
     rig.reset(new Softrock(sample_rate));
 #ifdef HAVE_BREADBOARD
   } else if (selected_rig == "Breadboard") {
-    rig.reset(new Breadboard());
+    rig.reset(new Breadboard(sample_rate));
 #endif
   } else if (selected_rig == "IQ Only") {
     rig.reset(new IQOnly(sample_rate));

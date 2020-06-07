@@ -5,7 +5,7 @@
 
 class Breadboard : public IQOnly {
 public:
-  Breadboard();
+  Breadboard(unsigned sample_rate);
   ~Breadboard();
   void set_freq(double);
 
