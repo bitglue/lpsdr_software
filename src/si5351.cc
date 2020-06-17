@@ -124,6 +124,8 @@ const char *Si5351FreqPlan::is_invalid() {
     if (double(output_div) > 2048)
       return "Output divider is greater than 2048";
   }
+  // REQUIRE(plan.pll_mult / plan.pll_div >= 15);
+  // REQUIRE((double)plan.pll_mult / plan.pll_div <= 90.0);
 
   return NULL;
 }
