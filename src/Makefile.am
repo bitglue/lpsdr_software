@@ -93,3 +93,10 @@ lpsdr_SOURCES = main.cc
 catch2_SOURCES = catch.hpp catch2_main.cc mode/wspr-test.cc jtinterval-test.cc
 catch2_LDADD = $(lpsdr_LDADD)
 TESTS = catch2
+
+format:
+	find . -name '*.cc' -or -name '*.h' | xargs clang-format -i
+
+.PHONY: test
+test: catch2
+	./catch2
