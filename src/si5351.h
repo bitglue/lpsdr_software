@@ -135,6 +135,30 @@ private:
   uint32_t m_p1, m_p2, m_p3;
 };
 
+enum class Si5351DrvStr : uint8_t {
+  mA_2 = 0,
+  mA_4 = 1,
+  mA_6 = 3,
+  mA_8 = 4,
+};
+
+struct Si5351ClkCtrl {
+  bool power_down;
+  bool int_mode;
+  Si5351PLL ms_source;
+  bool invert;
+  Si5351DrvStr drive_strength;
+
+  Si5351ClkCtrl(){};
+
+  uint8_t value() const {
+    return power_down << 7 | int_mode << 6 | (uint8_t)ms_source << 5 |
+           invert << 4 |
+           0x0c // No constants for the options, assume MultiSynth source
+           | (uint8_t)drive_strength;
+  };
+};
+
 class Si5351FreqPlan {
 public:
   Si5351FreqPlan(Rational xtal_freq, Rational out_freq);
@@ -177,8 +201,7 @@ public:
   void disableOutputs();
   void disableOutput(Si5351Output out);
   void enableOutput(Si5351Output out);
-  void setClkControl(unsigned clk, bool power_down, bool int_mode, bool invert,
-                     uint8_t drive_strength);
+  void setClkCtrl(Si5351Output out, const Si5351ClkCtrl &ctrl);
 
   static constexpr double MIN_PLL_FREQ = 600e6;
   static constexpr double MAX_PLL_FREQ = 900e6;

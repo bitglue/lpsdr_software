@@ -105,6 +105,23 @@ TEST_CASE("Si5351", "[si5351]") {
     // offset out of range
     CHECK_THROWS(si5351.setPhaseOffset(Si5351Output::OUT_0, 128));
   }
+
+  SECTION("set clk control") {
+    Si5351ClkCtrl ctrl;
+
+    CHECK(ctrl.power_down == false);
+    CHECK(ctrl.int_mode == false);
+    CHECK(ctrl.ms_source == Si5351PLL::PLL_A);
+    CHECK(ctrl.invert == false);
+    CHECK(ctrl.drive_strength == Si5351DrvStr::mA_2);
+
+    si5351.setClkCtrl(Si5351Output::OUT_0, ctrl);
+    CHECK((int)registers.read(16) == 0x0c);
+
+    ctrl.invert = true;
+    si5351.setClkCtrl(Si5351Output::OUT_1, ctrl);
+    CHECK((int)registers.read(17) == 0x1c);
+  }
 }
 
 TEST_CASE("Si5351Rational", "[si5351]") {

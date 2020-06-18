@@ -197,8 +197,7 @@ void Si5351::enableOutput(Si5351Output out) {
   m_registers.write(SI_OUTPUT_ENABLE, enabled);
 }
 
-void Si5351::setClkControl(unsigned clk, bool power_down, bool int_mode,
-                           bool invert, uint8_t drive_strength) {
-  m_registers.write(16 + clk, (power_down << 7) | (int_mode << 6) |
-                                  (invert << 4) | (drive_strength & 3));
+void Si5351::setClkCtrl(Si5351Output out, const Si5351ClkCtrl &ctrl) {
+  unsigned reg = 16 + (int)out;
+  m_registers.write(reg, ctrl.value());
 }

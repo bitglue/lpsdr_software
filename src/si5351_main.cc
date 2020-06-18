@@ -38,8 +38,11 @@ int main(int argc, char *argv[]) {
     si5351.setPhaseOffset(Si5351Output::OUT_5,
                           uint64_t(plan.output_div().multiplier()));
     si5351.resetPLL(true, true);
-    registers.write(SI_CLK4_CONTROL, 0x4F | SI_CLK_SRC_PLL_A);
-    registers.write(SI_CLK5_CONTROL, 0x4F | SI_CLK_SRC_PLL_A);
+
+    Si5351ClkCtrl ctrl;
+    ctrl.ms_source = Si5351PLL::PLL_A;
+    si5351.setClkCtrl(Si5351Output::OUT_4, ctrl);
+    si5351.setClkCtrl(Si5351Output::OUT_5, ctrl);
   }
   i2cClose(i2c);
   gpioTerminate();
